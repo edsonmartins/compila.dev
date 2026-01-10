@@ -238,185 +238,177 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-dark-bg">
+    <div className="p-6">
       {/* Header */}
-      <header className="bg-white dark:bg-dark-card border-b border-neutral-200 dark:border-dark-border">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground mb-2">
-                Marketplace de Vagas
-              </h1>
-              <p className="text-neutral-600 dark:text-dark-muted">
-                Encontre a oportunidade perfeita para evoluir sua carreira
-              </p>
-            </div>
-            <Button className="bg-accent hover:bg-accent/90 text-white">
-              <Briefcase className="h-4 w-4 mr-2" />
-              Anunciar Vaga
-            </Button>
-          </div>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-primary dark:text-dark-foreground mb-2">
+            Marketplace de Vagas
+          </h1>
+          <p className="text-neutral-dark dark:text-dark-muted">
+            Encontre a oportunidade perfeita para evoluir sua carreira
+          </p>
         </div>
+        <Button className="bg-accent hover:bg-accent/90 text-white">
+          <Briefcase className="h-4 w-4 mr-2" />
+          Anunciar Vaga
+        </Button>
+      </div>
 
-        {/* Filters */}
-        <div className="border-t border-neutral-200 dark:border-dark-border">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-neutral-500" />
-                <span className="text-sm font-medium">Filtros:</span>
-              </div>
-
-              <select
-                value={activeType}
-                onChange={(e) => setActiveType(e.target.value as JobType | 'all')}
-                className="px-3 py-1.5 bg-white dark:bg-dark-bg border border-neutral-300 dark:border-dark-border rounded-lg text-sm"
-              >
-                <option value="all">Todos os tipos</option>
-                <option value="FULL_TIME">CLT</option>
-                <option value="CONTRACT">PJ</option>
-                <option value="FREELANCE">Freelance</option>
-                <option value="PART_TIME">Part-time</option>
-                <option value="INTERNSHIP">Estágio</option>
-              </select>
-
-              <select
-                value={activeLevel}
-                onChange={(e) => setActiveLevel(e.target.value as JobLevel | 'all')}
-                className="px-3 py-1.5 bg-white dark:bg-dark-bg border border-neutral-300 dark:border-dark-border rounded-lg text-sm"
-              >
-                <option value="all">Todos os níveis</option>
-                <option value="JUNIOR">Júnior</option>
-                <option value="MID">Pleno</option>
-                <option value="SENIOR">Sênior</option>
-                <option value="LEAD">Tech Lead</option>
-                <option value="ARCHITECT">Arquiteto</option>
-              </select>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={remoteOnly}
-                  onChange={(e) => setRemoteOnly(e.target.checked)}
-                  className="rounded border-neutral-300"
-                />
-                <span className="text-sm">Apenas Remoto</span>
-              </label>
-            </div>
+      {/* Filters */}
+      <div className="bg-white dark:bg-dark-card rounded-xl border border-neutral-light dark:border-dark-border p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-neutral-500" />
+            <span className="text-sm font-medium">Filtros:</span>
           </div>
+
+          <select
+            value={activeType}
+            onChange={(e) => setActiveType(e.target.value as JobType | 'all')}
+            className="px-3 py-1.5 bg-white dark:bg-dark-background border border-neutral-light dark:border-dark-border rounded-lg text-sm"
+          >
+            <option value="all">Todos os tipos</option>
+            <option value="FULL_TIME">CLT</option>
+            <option value="CONTRACT">PJ</option>
+            <option value="FREELANCE">Freelance</option>
+            <option value="PART_TIME">Part-time</option>
+            <option value="INTERNSHIP">Estágio</option>
+          </select>
+
+          <select
+            value={activeLevel}
+            onChange={(e) => setActiveLevel(e.target.value as JobLevel | 'all')}
+            className="px-3 py-1.5 bg-white dark:bg-dark-background border border-neutral-light dark:border-dark-border rounded-lg text-sm"
+          >
+            <option value="all">Todos os níveis</option>
+            <option value="JUNIOR">Júnior</option>
+            <option value="MID">Pleno</option>
+            <option value="SENIOR">Sênior</option>
+            <option value="LEAD">Tech Lead</option>
+            <option value="ARCHITECT">Arquiteto</option>
+          </select>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={remoteOnly}
+              onChange={(e) => setRemoteOnly(e.target.checked)}
+              className="rounded border-neutral-300 dark:border-dark-border"
+            />
+            <span className="text-sm">Apenas Remoto</span>
+          </label>
         </div>
-      </header>
+      </div>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-8">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent" />
-          </div>
-        ) : (
-          <>
-            <p className="text-sm text-neutral-600 dark:text-dark-muted mb-6">
-              {filteredJobs.length} vaga{filteredJobs.length !== 1 ? 's' : ''} encontrada
-              {filteredJobs.length !== 1 ? 's' : ''}
-            </p>
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent" />
+        </div>
+      ) : (
+        <>
+          <p className="text-sm text-neutral-dark dark:text-dark-muted mb-4">
+            {filteredJobs.length} vaga{filteredJobs.length !== 1 ? 's' : ''} encontrada
+            {filteredJobs.length !== 1 ? 's' : ''}
+          </p>
 
-            <div className="space-y-4">
-              {filteredJobs.map((job) => (
-                <Link
-                  key={job.id}
-                  href={`/app/vagas/${job.slug}`}
-                  className="block group"
-                >
-                  <div className="bg-white dark:bg-dark-card rounded-xl shadow-sm border border-neutral-200 dark:border-dark-border p-6 hover:shadow-md transition-shadow">
-                    <div className="flex flex-col md:flex-row md:items-start gap-4">
-                      {/* Company Logo */}
-                      <div className="flex-shrink-0">
-                        {job.companyLogoUrl ? (
-                          <img
-                            src={job.companyLogoUrl}
-                            alt={job.companyName}
-                            className="h-12 w-12 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                            <Building2 className="h-6 w-6 text-accent" />
-                          </div>
+          <div className="space-y-4">
+            {filteredJobs.map((job) => (
+              <Link
+                key={job.id}
+                href={`/app/vagas/${job.slug}`}
+                className="block group"
+              >
+                <div className="bg-white dark:bg-dark-card rounded-xl border border-neutral-light dark:border-dark-border p-6 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col md:flex-row md:items-start gap-4">
+                    {/* Company Logo */}
+                    <div className="flex-shrink-0">
+                      {job.companyLogoUrl ? (
+                        <img
+                          src={job.companyLogoUrl}
+                          alt={job.companyName}
+                          className="h-12 w-12 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                          <Building2 className="h-6 w-6 text-accent" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        {job.featured && (
+                          <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                            Destaque
+                          </Badge>
+                        )}
+                        <span className={cn('text-xs px-2 py-1 rounded-full font-medium', getLevelColor(job.level))}>
+                          {getLevelLabel(job.level)}
+                        </span>
+                        <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 text-neutral-700 dark:bg-dark-border dark:text-dark-foreground">
+                          {getJobTypeLabel(job.type)}
+                        </span>
+                        {job.remote && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            Remoto
+                          </span>
                         )}
                       </div>
 
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          {job.featured && (
-                            <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-                              Destaque
-                            </Badge>
-                          )}
-                          <span className={cn('text-xs px-2 py-1 rounded-full font-medium', getLevelColor(job.level))}>
-                            {getLevelLabel(job.level)}
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 text-neutral-700 dark:bg-dark-border dark:text-dark-foreground">
-                            {getJobTypeLabel(job.type)}
-                          </span>
-                          {job.remote && (
-                            <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                              Remoto
-                            </span>
-                          )}
-                        </div>
+                      <h3 className="text-lg font-semibold text-primary dark:text-dark-foreground group-hover:text-accent transition-colors">
+                        {job.title}
+                      </h3>
+                      <p className="text-neutral-dark dark:text-dark-muted">
+                        {job.companyName}
+                      </p>
 
-                        <h3 className="text-lg font-semibold text-neutral-900 dark:text-dark-foreground group-hover:text-accent transition-colors">
-                          {job.title}
-                        </h3>
-                        <p className="text-neutral-600 dark:text-dark-muted mb-3">
-                          {job.companyName}
-                        </p>
+                      <p className="text-sm text-primary dark:text-dark-foreground mb-3 line-clamp-2">
+                        {job.description}
+                      </p>
 
-                        <p className="text-sm text-neutral-700 dark:text-dark-foreground mb-3 line-clamp-2">
-                          {job.description}
-                        </p>
-
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-dark-muted">
-                          {job.location && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {job.location}
-                            </span>
-                          )}
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-dark dark:text-dark-muted">
+                        {job.location && (
                           <span className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4" />
-                            {formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency)}
+                            <MapPin className="h-4 w-4" />
+                            {job.location}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {formatTimeAgo(job.postedAt)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <ExternalLink className="h-4 w-4" />
-                            {job.viewsCount} visualizações
-                          </span>
-                        </div>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="h-4 w-4" />
+                          {formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {formatTimeAgo(job.postedAt)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <ExternalLink className="h-4 w-4" />
+                          {job.viewsCount} visualizações
+                        </span>
+                      </div>
 
-                        {/* Technologies */}
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {job.technologies.map((tech) => (
-                            <span
-                              key={tech}
-                              className="px-2 py-1 bg-neutral-100 dark:bg-dark-border rounded text-xs"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
+                      {/* Technologies */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {job.technologies.map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-2 py-1 bg-neutral-100 dark:bg-dark-border rounded text-xs"
+                          >
+                            {tech}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </>
-        )}
-      </main>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
