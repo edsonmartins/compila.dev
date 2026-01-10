@@ -74,3 +74,11 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
   setToken(response.accessToken);
   return response;
 }
+
+/**
+ * Refresh user data from the API
+ * Useful after updating profile or completing challenges
+ */
+export async function refreshUser(): Promise<UserResponse> {
+  return fetchApi<UserResponse>('/auth/me');
+}
