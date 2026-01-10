@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { FeedPostComponent, PostType } from './FeedPost';
+import { cn } from '@/lib/utils';
 
 interface CreatePostDialogProps {
   open: boolean;

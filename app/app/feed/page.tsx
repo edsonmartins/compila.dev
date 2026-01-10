@@ -5,6 +5,7 @@ import { Plus, TrendingUp, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FeedPostComponent, { FeedPost } from '@/components/app/social/FeedPost';
 import { CreatePostDialog } from '@/components/app/social/CreatePostDialog';
+import { cn } from '@/lib/utils';
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
