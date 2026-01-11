@@ -6,166 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-
-interface LearningPath {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  shortDescription: string;
-  stack: string;
-  level: string;
-  estimatedWeeks: number;
-  xpTotal: number;
-  coverImageUrl: string;
-  enrolledCount: number;
-  completedCount: number;
-  featured: boolean;
-  author?: {
-    username: string;
-    fullName: string;
-    avatarUrl: string;
-  };
-  userProgress?: {
-    status: 'not_started' | 'in_progress' | 'completed';
-    currentStep: number;
-    totalSteps: number;
-    completionPercentage: number;
-    xpGained: number;
-  };
-}
+import { getLearningPaths, getLearningPathsByStack, type LearningPath } from '@/lib/api/learning-paths';
 
 export default function LearningPathsPage() {
   const [paths, setPaths] = useState<LearningPath[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'frontend' | 'backend' | 'mobile' | 'devops'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'frontend' | 'backend' | 'mobile' | 'devops' | 'data'>('all');
 
   useEffect(() => {
-    // TODO: Fetch learning paths from API
-    const mockPaths: LearningPath[] = [
-      {
-        id: '1',
-        slug: 'frontend-iniciante',
-        title: 'Frontend do Zero',
-        description: 'Aprenda HTML, CSS e JavaScript do absoluto zero. Esta trilha é perfeita para quem está começando na programação web.',
-        shortDescription: 'Inicie sua jornada como desenvolvedor frontend.',
-        stack: 'FRONTEND',
-        level: 'BEGINNER',
-        estimatedWeeks: 8,
-        xpTotal: 500,
-        coverImageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800',
-        enrolledCount: 1234,
-        completedCount: 456,
-        featured: true,
-        author: {
-          username: 'felipe_dev',
-          fullName: 'Felipe Souza',
-          avatarUrl: 'https://i.pravatar.cc/150?img=3',
-        },
-      },
-      {
-        id: '2',
-        slug: 'javascript-avancado',
-        title: 'JavaScript Avançado',
-        description: 'Domine conceitos avançados de JavaScript como closures, promises, async/await, e muito mais.',
-        shortDescription: 'Closures, promises, async/await e muito mais.',
-        stack: 'FRONTEND',
-        level: 'SENIOR',
-        estimatedWeeks: 6,
-        xpTotal: 800,
-        coverImageUrl: 'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=800',
-        enrolledCount: 892,
-        completedCount: 123,
-        featured: true,
-        author: {
-          username: 'maria_js',
-          fullName: 'Maria Silva',
-          avatarUrl: 'https://i.pravatar.cc/150?img=5',
-        },
-        userProgress: {
-          status: 'in_progress',
-          currentStep: 3,
-          totalSteps: 10,
-          completionPercentage: 30,
-          xpGained: 240,
-        },
-      },
-      {
-        id: '3',
-        slug: 'react-completo',
-        title: 'React Completo',
-        description: 'Torne-se um especialista em React. Hooks, Context API, performance testing e muito mais.',
-        shortDescription: 'Hooks, context, performance testing e mais.',
-        stack: 'FRONTEND',
-        level: 'MID',
-        estimatedWeeks: 10,
-        xpTotal: 1200,
-        coverImageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800',
-        enrolledCount: 2341,
-        completedCount: 567,
-        featured: true,
-        author: {
-          username: 'pedro_react',
-          fullName: 'Pedro Santos',
-          avatarUrl: 'https://i.pravatar.cc/150?img=12',
-        },
-      },
-      {
-        id: '4',
-        slug: 'nodejs-api-rest',
-        title: 'Node.js - APIs REST',
-        description: 'Aprenda a construir APIs REST robustas com Node.js, Express e MongoDB.',
-        shortDescription: 'Construa APIs REST escaláveis com Node.js.',
-        stack: 'BACKEND',
-        level: 'JUNIOR',
-        estimatedWeeks: 6,
-        xpTotal: 700,
-        coverImageUrl: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800',
-        enrolledCount: 1567,
-        completedCount: 234,
-        featured: false,
-      },
-      {
-        id: '5',
-        slug: 'python-data-science',
-        title: 'Python para Data Science',
-        description: 'Aprenda Python e suas bibliotecas essenciais para Data Science: Pandas, NumPy, Matplotlib.',
-        shortDescription: 'Análise de dados com Python.',
-        stack: 'DATA',
-        level: 'BEGINNER',
-        estimatedWeeks: 12,
-        xpTotal: 1500,
-        coverImageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800',
-        enrolledCount: 987,
-        completedCount: 89,
-        featured: false,
-      },
-      {
-        id: '6',
-        slug: 'docker-k8s',
-        title: 'Docker e Kubernetes',
-        description: 'Domine a conteinerização e orquestração com Docker e Kubernetes.',
-        shortDescription: 'Conteinerização e orquestração de containers.',
-        stack: 'DEVOPS',
-        level: 'SENIOR',
-        estimatedWeeks: 8,
-        xpTotal: 1000,
-        coverImageUrl: 'https://images.unsplash.com/photo-1667372393119-c3a613edfe1c?w=800',
-        enrolledCount: 654,
-        completedCount: 45,
-        featured: false,
-      },
-    ];
-
-    setTimeout(() => {
-      setPaths(mockPaths);
-      setLoading(false);
-    }, 500);
-  }, []);
-
-  const filteredPaths = activeFilter === 'all'
-    ? paths
-    : paths.filter((p) => p.stack.toLowerCase() === activeFilter);
+    const fetchPaths = async () => {
+      setLoading(true);
+      try {
+        const data = activeFilter === 'all'
+          ? await getLearningPaths()
+          : await getLearningPathsByStack(activeFilter === 'data' ? 'DATA_SCIENCE' : activeFilter.toUpperCase());
+        setPaths(data);
+      } catch (error) {
+        console.error('Failed to fetch learning paths:', error);
+        setPaths([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPaths();
+  }, [activeFilter]);
 
   const getLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
@@ -195,7 +59,10 @@ export default function LearningPathsPage() {
       case 'devops':
         return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
       case 'data':
+      case 'data_science':
         return 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400';
+      case 'full_stack':
+        return 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400';
       default:
         return 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400';
     }
@@ -270,6 +137,17 @@ export default function LearningPathsPage() {
         >
           DevOps
         </button>
+        <button
+          onClick={() => setActiveFilter('data')}
+          className={cn(
+            'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors',
+            activeFilter === 'data'
+              ? 'bg-accent text-white'
+              : 'bg-white dark:bg-dark-card text-neutral-dark dark:text-dark-foreground border border-neutral-light dark:border-dark-border hover:bg-neutral-light dark:hover:bg-dark-border/50'
+          )}
+        >
+          Data Science
+        </button>
       </div>
 
       {/* Content */}
@@ -279,7 +157,7 @@ export default function LearningPathsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPaths.map((path) => (
+          {paths.map((path) => (
             <Link
               key={path.id}
               href={`/app/trilhas/${path.slug}`}
@@ -367,19 +245,19 @@ export default function LearningPathsPage() {
                   )}
 
                   {/* Author */}
-                  {path.author && (
+                  {path.authorName && (
                     <div className="flex items-center gap-2 pt-3 border-t border-neutral-light dark:border-dark-border">
                       <Avatar className="h-6 w-6">
-                        <AvatarImage src={path.author.avatarUrl} alt={path.author.username} />
+                        <AvatarImage src={path.authorAvatarUrl} alt={path.authorName} />
                         <AvatarFallback className="text-xs bg-accent text-white">
-                          {path.author.fullName
+                          {path.authorName
                             .split(' ')
                             .map((n) => n[0])
                             .join('')}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-xs text-neutral-dark dark:text-dark-muted">
-                        por {path.author.fullName}
+                        por {path.authorName}
                       </span>
                     </div>
                   )}

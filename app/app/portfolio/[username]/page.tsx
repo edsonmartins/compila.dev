@@ -17,23 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-
-interface UserProfile {
-  id: string;
-  username: string;
-  fullName: string;
-  bio: string;
-  avatarUrl: string;
-  location: string;
-  websiteUrl: string;
-  githubUrl: string;
-  linkedinUrl: string;
-  level: number;
-  xp: number;
-  streakCurrent: number;
-  streakBest: number;
-  joinedAt: string;
-}
+import { getUserProfile, type UserProfile } from '@/lib/api/users';
 
 interface Project {
   id: string;
@@ -49,12 +33,6 @@ interface Project {
   createdAt: string;
 }
 
-interface Achievement {
-  id: string;
-  type: string;
-  earnedAt: string;
-}
-
 export default function UserProfilePage() {
   const params = useParams();
   const username = params.username as string;
@@ -62,73 +40,28 @@ export default function UserProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    // TODO: Fetch user data from API
-    const mockUser: UserProfile = {
-      id: '1',
-      username: username,
-      fullName: 'João Silva',
-      bio: 'Desenvolvedor Full Stack apaixonado por React e Node.js. Sempre aprendendo e compartilhando conhecimento.',
-      avatarUrl: 'https://i.pravatar.cc/150?img=11',
-      location: 'São Paulo, Brasil',
-      websiteUrl: 'https://joaosilva.dev',
-      githubUrl: 'https://github.com/joaosilva',
-      linkedinUrl: 'https://linkedin.com/in/joaosilva',
-      level: 12,
-      xp: 12450,
-      streakCurrent: 7,
-      streakBest: 30,
-      joinedAt: '2024-01-15',
+    const fetchUserData = async () => {
+      setLoading(true);
+      setNotFound(false);
+      try {
+        const userData = await getUserProfile(username);
+        setUser(userData);
+
+        // TODO: Fetch user projects from API
+        const mockProjects: Project[] = [];
+        setProjects(mockProjects);
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const mockProjects: Project[] = [
-      {
-        id: '1',
-        title: 'E-commerce Platform',
-        description: 'Plataforma de e-commerce completa com carrinho, pagamentos e dashboard administrativo.',
-        coverImageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
-        projectUrl: 'https://demo.com',
-        repositoryUrl: 'https://github.com/joaosilva/ecommerce',
-        technologies: ['React', 'Node.js', 'PostgreSQL', 'Stripe'],
-        viewsCount: 1234,
-        likesCount: 45,
-        featured: true,
-        createdAt: '2024-06-15',
-      },
-      {
-        id: '2',
-        title: 'Task Management App',
-        description: 'Aplicativo de gerenciamento de tarefas com drag-and-drop e colaboração em tempo real.',
-        coverImageUrl: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800',
-        projectUrl: 'https://tasks.app',
-        repositoryUrl: 'https://github.com/joaosilva/tasks',
-        technologies: ['Next.js', 'TypeScript', 'Prisma', 'WebSocket'],
-        viewsCount: 892,
-        likesCount: 32,
-        featured: true,
-        createdAt: '2024-07-20',
-      },
-      {
-        id: '3',
-        title: 'Weather Dashboard',
-        description: 'Dashboard interativo de previsão do tempo com mapas e gráficos.',
-        coverImageUrl: 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800',
-        projectUrl: 'https://weather.app',
-        repositoryUrl: 'https://github.com/joaosilva/weather',
-        technologies: ['Vue.js', 'D3.js', 'OpenWeather API'],
-        viewsCount: 567,
-        likesCount: 21,
-        featured: false,
-        createdAt: '2024-08-10',
-      },
-    ];
-
-    setTimeout(() => {
-      setUser(mockUser);
-      setProjects(mockProjects);
-      setLoading(false);
-    }, 500);
+    fetchUserData();
   }, [username]);
 
   if (loading) {
@@ -139,7 +72,7 @@ export default function UserProfilePage() {
     );
   }
 
-  if (!user) {
+  if (notFound || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -168,7 +101,7 @@ export default function UserProfilePage() {
             {/* Avatar */}
             <div className="flex-shrink-0">
               <Avatar className="h-40 w-40 border-4 border-white dark:border-dark-card">
-                <AvatarImage src={user.avatarUrl} alt={user.username} />
+                <AvatarImage src={user.avatarUrl ?? undefined} alt={user.username} />
                 <AvatarFallback className="text-3xl bg-accent text-white">
                   {user.fullName
                     .split(' ')
@@ -188,7 +121,7 @@ export default function UserProfilePage() {
                   <p className="text-neutral-600 dark:text-dark-muted">@{user.username}</p>
 
                   <p className="mt-4 text-neutral-700 dark:text-dark-foreground max-w-2xl">
-                    {user.bio}
+                    {user.bio || 'Sem biografia.'}
                   </p>
 
                   {/* Location & Links */}

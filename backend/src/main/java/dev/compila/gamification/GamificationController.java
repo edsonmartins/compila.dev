@@ -1,6 +1,7 @@
 package dev.compila.gamification;
 
 import dev.compila.gamification.dto.BadgeResponse;
+import dev.compila.gamification.dto.RankingResponse;
 import dev.compila.gamification.dto.UserStatsResponse;
 import dev.compila.gamification.enums.BadgeType;
 import org.springframework.http.ResponseEntity;
@@ -54,5 +55,12 @@ public class GamificationController {
     ) {
         gamificationService.updateStreak(userId, streak);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<List<RankingResponse>> getRanking(
+            @RequestParam(defaultValue = "100") int limit
+    ) {
+        return ResponseEntity.ok(gamificationService.getRanking(limit));
     }
 }

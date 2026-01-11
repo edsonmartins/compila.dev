@@ -1,5 +1,6 @@
 package dev.compila.submission;
 
+import dev.compila.auth.security.userdetails.UserDetailsImpl;
 import dev.compila.submission.dto.SubmitRequest;
 import dev.compila.submission.dto.SubmissionResponse;
 import jakarta.validation.Valid;
@@ -62,8 +63,8 @@ public class SubmissionController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody SubmitRequest request
     ) {
-        // Extract user ID from email (you may want to store userId in JWT claims instead)
-        UUID userId = UUID.randomUUID(); // TODO: Get from JWT
+        // Extract user ID from authenticated user
+        UUID userId = ((UserDetailsImpl) userDetails).getId();
         return ResponseEntity.ok(submissionService.submit(userId, request));
     }
 }

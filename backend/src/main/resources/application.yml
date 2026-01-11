@@ -101,6 +101,19 @@ cors:
 ai-service:
   base-url: ${AI_SERVICE_URL:http://localhost:8001}
   timeout: ${AI_SERVICE_TIMEOUT:30000}
+  api-key: ${AI_SERVICE_API_KEY:}
+  model: ${AI_SERVICE_MODEL:gpt-4}
+  enabled: ${AI_SERVICE_ENABLED:true}
+
+# Code Execution
+code-execution:
+  enabled: ${CODE_EXECUTION_ENABLED:true}
+  docker-image: ${CODE_EXECUTION_DOCKER_IMAGE:compila/executor:latest}
+  default-timeout: ${CODE_EXECUTION_TIMEOUT:10s}
+  max-memory-mb: ${CODE_EXECUTION_MAX_MEMORY_MB:256}
+  max-cpu-cores: ${CODE_EXECUTION_MAX_CPU:1}
+  use-docker: ${CODE_EXECUTION_USE_DOCKER:false}
+  work-dir: ${CODE_EXECUTION_WORK_DIR:/tmp/compila-exec}
 
 # Logging
 logging:

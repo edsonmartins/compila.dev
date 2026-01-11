@@ -1,6 +1,7 @@
 package dev.compila.gamification;
 
 import dev.compila.gamification.dto.BadgeResponse;
+import dev.compila.gamification.dto.RankingResponse;
 import dev.compila.gamification.dto.UserStatsResponse;
 import dev.compila.gamification.enums.BadgeType;
 import dev.compila.user.User;
@@ -128,5 +129,27 @@ public class GamificationService {
     private int calculateLevelProgress(long xp, int level) {
         long xpInCurrentLevel = xp - (level * 1000L);
         return (int) ((xpInCurrentLevel / 1000.0) * 100);
+    }
+
+    /**
+     * Get global ranking by XP
+     * @param limit Maximum number of users to return
+     * @return List of users ordered by XP descending
+     */
+    public List<RankingResponse> getRanking(int limit) {
+        List<Object[]> results = userRepository.findRankingData();
+
+        return results.stream()
+                .limit(limit)
+                .map(row -> new RankingResponse(
+                        (UUID) row[0],
+                        (String) row[1],
+                        (String) row[2],
+                        (String) row[3],
+                        (Integer) row[4],
+                        (Long) row[5],
+                        results.indexOf(row) + 1
+                ))
+                .toList();
     }
 }

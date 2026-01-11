@@ -1,5 +1,9 @@
 package dev.compila.submission;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.compila.ai.AiEvaluationService;
+import dev.compila.ai.dto.CodeEvaluationRequest;
+import dev.compila.ai.dto.CodeEvaluationResponse;
 import dev.compila.challenge.Challenge;
 import dev.compila.challenge.ChallengeRepository;
 import dev.compila.submission.dto.SubmitRequest;
@@ -9,11 +13,13 @@ import dev.compila.user.User;
 import dev.compila.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -22,11 +28,21 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
+    private final AiEvaluationService aiEvaluationService;
+    private final ObjectMapper objectMapper;
 
-    public SubmissionService(SubmissionRepository submissionRepository, UserRepository userRepository, ChallengeRepository challengeRepository) {
+    public SubmissionService(
+            SubmissionRepository submissionRepository,
+            UserRepository userRepository,
+            ChallengeRepository challengeRepository,
+            AiEvaluationService aiEvaluationService,
+            ObjectMapper objectMapper
+    ) {
         this.submissionRepository = submissionRepository;
         this.userRepository = userRepository;
         this.challengeRepository = challengeRepository;
+        this.aiEvaluationService = aiEvaluationService;
+        this.objectMapper = objectMapper;
     }
 
     public Page<SubmissionResponse> findByUserId(UUID userId, Pageable pageable) {
@@ -76,10 +92,72 @@ public class SubmissionService {
         // Increment challenge attempted count
         challengeRepository.incrementAttemptedCount(request.challengeId());
 
-        // TODO: Execute tests asynchronously
-        // This will be integrated with the AI service
+        // Trigger async AI evaluation
+        evaluateSubmissionAsync(submission.getId(), submission, challenge);
 
         return SubmissionResponse.from(submission);
+    }
+
+    @Async
+    public void evaluateSubmissionAsync(UUID submissionId, Submission submission, Challenge challenge) {
+        try {
+            // Parse challenge requirements to get test cases
+            Map<String, Object> requirements = objectMapper.readValue(
+                    challenge.getRequirements() != null ? challenge.getRequirements() : "{}",
+                    objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class)
+            );
+
+            // Extract test cases from requirements
+            List<String> testCases = extractTestCases(requirements);
+            String expectedOutput = extractExpectedOutput(requirements);
+
+            // Build evaluation request
+            CodeEvaluationRequest.EvaluationConstraints constraints = new CodeEvaluationRequest.EvaluationConstraints(
+                    256, // maxMemoryMb
+                    10,  // maxTimeSeconds
+                    null  // allowedImports
+            );
+
+            CodeEvaluationRequest evaluationRequest = new CodeEvaluationRequest(
+                    submission.getCode(),
+                    submission.getLanguage().name(),
+                    challenge.getDescription(),
+                    testCases,
+                    expectedOutput,
+                    constraints
+            );
+
+            // Call AI evaluation service
+            CodeEvaluationResponse evaluation = aiEvaluationService.evaluateCode(evaluationRequest);
+
+            // Update submission with results
+            SubmissionStatus status = evaluation.passed() ? SubmissionStatus.PASSED : SubmissionStatus.FAILED;
+            int score = evaluation.score() != null ? evaluation.score() : 0;
+            int xpGained = evaluation.passed() ? challenge.getXpReward() : 0;
+
+            // Serialize test results
+            String testResultsJson = objectMapper.writeValueAsString(evaluation.testResults());
+
+            updateStatus(submissionId, status, score, xpGained, testResultsJson);
+
+        } catch (Exception e) {
+            // Mark as failed on error
+            updateStatus(submissionId, SubmissionStatus.FAILED, 0, 0, null);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> extractTestCases(Map<String, Object> requirements) {
+        Object tests = requirements.get("testCases");
+        if (tests instanceof List) {
+            return (List<String>) tests;
+        }
+        return List.of();
+    }
+
+    private String extractExpectedOutput(Map<String, Object> requirements) {
+        Object output = requirements.get("expectedOutput");
+        return output != null ? output.toString() : null;
     }
 
     @Transactional

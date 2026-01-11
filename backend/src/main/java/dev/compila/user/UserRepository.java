@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,5 +28,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u ORDER BY u.xp DESC")
-    java.util.List<User> findTopByXpDesc();
+    List<User> findTopByXpDesc();
+
+    @Query("SELECT u.id, u.username, u.fullName, u.avatarUrl, u.level, u.xp FROM User u ORDER BY u.xp DESC")
+    List<Object[]> findRankingData();
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.lastActiveAt >= :date")
+    long countByLastActiveAtAfter(@Param("date") LocalDateTime date);
 }

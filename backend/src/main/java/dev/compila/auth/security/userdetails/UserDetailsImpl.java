@@ -54,6 +54,10 @@ public class UserDetailsImpl implements UserDetails {
         );
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;

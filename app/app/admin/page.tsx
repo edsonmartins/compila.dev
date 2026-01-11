@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   Users,
   Trophy,
@@ -10,161 +12,37 @@ import {
   BarChart3,
   Activity,
   Clock,
+  Shield,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { cn } from '@/lib/utils';
-
-interface DashboardStats {
-  totalUsers: number;
-  activeUsers: number;
-  totalChallenges: number;
-  totalSubmissions: number;
-  successRate: number;
-  avgCompletionTime: number;
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'user_registered' | 'challenge_completed' | 'submission' | 'post';
-  user: {
-    username: string;
-    fullName: string;
-    avatarUrl: string;
-  };
-  description: string;
-  createdAt: string;
-}
-
-interface TopUser {
-  id: string;
-  username: string;
-  fullName: string;
-  avatarUrl: string;
-  xp: number;
-  level: number;
-  challengesCompleted: number;
-}
+import { useTheme } from '@/components/providers/ThemeProvider';
+import { getAdminStats, type AdminDashboardStats, type TopUser, type RecentActivity } from '@/lib/api/admin';
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
-  const [topUsers, setTopUsers] = useState<TopUser[]>([]);
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    // TODO: Fetch data from admin API
-    const mockStats: DashboardStats = {
-      totalUsers: 12453,
-      activeUsers: 3892,
-      totalChallenges: 156,
-      totalSubmissions: 45678,
-      successRate: 73.5,
-      avgCompletionTime: 25,
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getAdminStats();
+        setStats(data);
+      } catch (err) {
+        console.error('Failed to fetch admin stats:', err);
+        setError('Falha ao carregar dados do dashboard');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const mockActivities: RecentActivity[] = [
-      {
-        id: '1',
-        type: 'challenge_completed',
-        user: {
-          username: 'maria_dev',
-          fullName: 'Maria Santos',
-          avatarUrl: 'https://i.pravatar.cc/150?img=5',
-        },
-        description: 'Completou o desafio "FizzBuzz Clássico"',
-        createdAt: new Date(Date.now() - 5 * 60000).toISOString(),
-      },
-      {
-        id: '2',
-        type: 'user_registered',
-        user: {
-          username: 'novo_usuario',
-          fullName: 'João Pedro',
-          avatarUrl: 'https://i.pravatar.cc/150?img=15',
-        },
-        description: 'Criou uma conta na plataforma',
-        createdAt: new Date(Date.now() - 15 * 60000).toISOString(),
-      },
-      {
-        id: '3',
-        type: 'submission',
-        user: {
-          username: 'pedro_code',
-          fullName: 'Pedro Costa',
-          avatarUrl: 'https://i.pravatar.cc/150?img=12',
-        },
-        description: 'Submeteu uma solução para "Lista de Tarefas"',
-        createdAt: new Date(Date.now() - 30 * 60000).toISOString(),
-      },
-      {
-        id: '4',
-        type: 'post',
-        user: {
-          username: 'ana_js',
-          fullName: 'Ana Silva',
-          avatarUrl: 'https://i.pravatar.cc/150?img=9',
-        },
-        description: 'Publicou no feed sobre React Hooks',
-        createdAt: new Date(Date.now() - 45 * 60000).toISOString(),
-      },
-    ];
-
-    const mockTopUsers: TopUser[] = [
-      {
-        id: '1',
-        username: 'felipe_master',
-        fullName: 'Felipe Souza',
-        avatarUrl: 'https://i.pravatar.cc/150?img=3',
-        xp: 45670,
-        level: 45,
-        challengesCompleted: 123,
-      },
-      {
-        id: '2',
-        username: 'julia_code',
-        fullName: 'Júnia Rocha',
-        avatarUrl: 'https://i.pravatar.cc/150?img=23',
-        xp: 38920,
-        level: 38,
-        challengesCompleted: 98,
-      },
-      {
-        id: '3',
-        username: 'carlos_dev',
-        fullName: 'Carlos Mendes',
-        avatarUrl: 'https://i.pravatar.cc/150?img=32',
-        xp: 34500,
-        level: 34,
-        challengesCompleted: 87,
-      },
-      {
-        id: '4',
-        username: 'bruno_full',
-        fullName: 'Bruno Almeida',
-        avatarUrl: 'https://i.pravatar.cc/150?img=51',
-        xp: 28900,
-        level: 28,
-        challengesCompleted: 72,
-      },
-      {
-        id: '5',
-        username: 'lucia_js',
-        fullName: 'Lúcia Ferreira',
-        avatarUrl: 'https://i.pravatar.cc/150?img=44',
-        xp: 23450,
-        level: 23,
-        challengesCompleted: 56,
-      },
-    ];
-
-    setTimeout(() => {
-      setStats(mockStats);
-      setRecentActivities(mockActivities);
-      setTopUsers(mockTopUsers);
-      setLoading(false);
-    }, 500);
+    fetchData();
   }, []);
 
   const formatTimeAgo = (dateString: string) => {
@@ -199,21 +77,72 @@ export default function AdminDashboardPage() {
     );
   }
 
+  if (error || !stats) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Erro ao Carregar</h2>
+          <p className="text-neutral-600 dark:text-dark-muted">{error || 'Dados não disponíveis'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-dark-background">
       {/* Header */}
-      <header className="bg-white dark:bg-dark-card border-b border-neutral-200 dark:border-dark-border">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-dark-foreground">
-            Dashboard Administrativo
-          </h1>
-          <p className="text-neutral-600 dark:text-dark-muted mt-1">
-            Visão geral da plataforma Compila.dev
-          </p>
+      <header className="bg-white dark:bg-dark-card border-b border-neutral-200 dark:border-dark-border sticky top-0 z-40">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              {/* Logo */}
+              <Link href="/">
+                <Image
+                  src={
+                    resolvedTheme === 'dark'
+                      ? '/images/compila-dev_branco.png'
+                      : '/images/compila-dev.png'
+                  }
+                  alt="Compila.dev"
+                  width={180}
+                  height={45}
+                  className="h-10 w-auto"
+                />
+              </Link>
+
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-2 text-sm">
+                <Link href="/" className="text-neutral-600 dark:text-dark-muted hover:text-accent">
+                  Home
+                </Link>
+                <span className="text-neutral-400">/</span>
+                <span className="flex items-center gap-1 text-neutral-900 dark:text-dark-foreground font-medium">
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </span>
+              </div>
+            </div>
+
+            {/* Admin badge */}
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 rounded-full">
+              <Shield className="h-4 w-4 text-accent" />
+              <span className="text-sm font-medium text-accent">Administrador</span>
+            </div>
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
+            Dashboard Administrativo
+          </h1>
+          <p className="text-neutral-600 dark:text-dark-muted mt-2">
+            Visão geral da plataforma Compila.dev
+          </p>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Users */}
@@ -226,7 +155,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
-                {stats?.totalUsers.toLocaleString()}
+                {stats.totalUsers.toLocaleString()}
               </div>
               <p className="text-xs text-neutral-600 dark:text-dark-muted mt-1">
                 <span className="text-green-500">+12%</span> vs mês passado
@@ -244,7 +173,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
-                {stats?.activeUsers.toLocaleString()}
+                {stats.activeUsers.toLocaleString()}
               </div>
               <p className="text-xs text-neutral-600 dark:text-dark-muted mt-1">
                 Últimos 30 dias
@@ -262,10 +191,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
-                {stats?.totalChallenges}
+                {stats.totalChallenges}
               </div>
               <p className="text-xs text-neutral-600 dark:text-dark-muted mt-1">
-                {Math.round((stats?.totalChallenges || 0) * 0.8)} publicados
+                {Math.round(stats.totalChallenges * 0.8)} publicados
               </p>
             </CardContent>
           </Card>
@@ -280,7 +209,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
-                {stats?.totalSubmissions.toLocaleString()}
+                {stats.totalSubmissions.toLocaleString()}
               </div>
               <p className="text-xs text-neutral-600 dark:text-dark-muted mt-1">
                 <span className="text-green-500">+8%</span> vs mês passado
@@ -298,7 +227,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
-                {stats?.successRate}%
+                {stats.successRate}%
               </div>
               <p className="text-xs text-neutral-600 dark:text-dark-muted mt-1">
                 Média geral
@@ -316,7 +245,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground">
-                {stats?.avgCompletionTime}m
+                {stats.avgCompletionTimeMinutes}m
               </div>
               <p className="text-xs text-neutral-600 dark:text-dark-muted mt-1">
                 Por submissão
@@ -333,36 +262,42 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-dark-border transition-colors"
-                  >
-                    <div className="flex-shrink-0 p-2 bg-neutral-100 dark:bg-dark-border rounded-full">
-                      {getActivityIcon(activity.type)}
+                {stats.recentActivities.length > 0 ? (
+                  stats.recentActivities.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-dark-border transition-colors"
+                    >
+                      <div className="flex-shrink-0 p-2 bg-neutral-100 dark:bg-dark-border rounded-full">
+                        {getActivityIcon(activity.type as any)}
+                      </div>
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={activity.username} alt={activity.username} />
+                        <AvatarFallback>
+                          {activity.fullName
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-neutral-900 dark:text-dark-foreground">
+                          {activity.fullName}
+                        </p>
+                        <p className="text-sm text-neutral-600 dark:text-dark-muted truncate">
+                          {activity.description}
+                        </p>
+                      </div>
+                      <span className="text-xs text-neutral-500 dark:text-dark-muted whitespace-nowrap">
+                        {formatTimeAgo(activity.createdAt)}
+                      </span>
                     </div>
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={activity.user.avatarUrl} alt={activity.user.username} />
-                      <AvatarFallback>
-                        {activity.user.fullName
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-dark-foreground">
-                        {activity.user.fullName}
-                      </p>
-                      <p className="text-sm text-neutral-600 dark:text-dark-muted truncate">
-                        {activity.description}
-                      </p>
-                    </div>
-                    <span className="text-xs text-neutral-500 dark:text-dark-muted whitespace-nowrap">
-                      {formatTimeAgo(activity.createdAt)}
-                    </span>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-neutral-600 dark:text-dark-muted text-center py-4">
+                    Nenhuma atividade recente
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -374,7 +309,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topUsers.map((user, index) => (
+                {stats.topUsers.map((user, index) => (
                   <div
                     key={user.id}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-50 dark:hover:bg-dark-border transition-colors"

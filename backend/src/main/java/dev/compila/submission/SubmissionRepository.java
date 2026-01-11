@@ -1,5 +1,6 @@
 package dev.compila.submission;
 
+import dev.compila.submission.enums.SubmissionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,6 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
 
     @Query("SELECT s FROM Submission s WHERE s.userId = :userId AND s.challengeId = :challengeId ORDER BY s.submittedAt DESC")
     java.util.List<Submission> findLatestByUserAndChallenge(@Param("userId") UUID userId, @Param("challengeId") UUID challengeId);
+
+    long countByStatus(SubmissionStatus status);
 }
