@@ -7,7 +7,13 @@ Handlers for streaming logs to WebSocket clients.
 """
 
 import asyncio
-import logging
+import sys
+
+# Use stdlib logging from __init__.py
+logging = sys.modules.get('_stdlib_logging')
+if logging is None:
+    import logging as _fallback_logging
+    logging = _fallback_logging
 
 
 class WebSocketLogHandler(logging.Handler):

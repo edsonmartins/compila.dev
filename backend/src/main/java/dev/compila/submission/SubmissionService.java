@@ -9,8 +9,14 @@ import dev.compila.challenge.ChallengeRepository;
 import dev.compila.submission.dto.SubmitRequest;
 import dev.compila.submission.dto.SubmissionResponse;
 import dev.compila.submission.enums.SubmissionStatus;
+import dev.compila.social.service.SocialTriggerService;
 import dev.compila.user.User;
 import dev.compila.user.UserRepository;
+import dev.compila.submission.enums.ProgrammingLanguage;
+import dev.compila.user.enums.TechnologyType;
+import dev.compila.user.service.UserSkillService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -25,24 +31,32 @@ import java.util.UUID;
 @Service
 public class SubmissionService {
 
+    private static final Logger log = LoggerFactory.getLogger(SubmissionService.class);
+
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
     private final AiEvaluationService aiEvaluationService;
     private final ObjectMapper objectMapper;
+    private final SocialTriggerService socialTriggerService;
+    private final UserSkillService userSkillService;
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
             UserRepository userRepository,
             ChallengeRepository challengeRepository,
             AiEvaluationService aiEvaluationService,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            SocialTriggerService socialTriggerService,
+            UserSkillService userSkillService
     ) {
         this.submissionRepository = submissionRepository;
         this.userRepository = userRepository;
         this.challengeRepository = challengeRepository;
         this.aiEvaluationService = aiEvaluationService;
         this.objectMapper = objectMapper;
+        this.socialTriggerService = socialTriggerService;
+        this.userSkillService = userSkillService;
     }
 
     public Page<SubmissionResponse> findByUserId(UUID userId, Pageable pageable) {
@@ -181,6 +195,9 @@ public class SubmissionService {
         if (status == SubmissionStatus.PASSED) {
             challengeRepository.incrementCompletedCount(submission.getChallengeId());
 
+            Challenge challenge = challengeRepository.findById(submission.getChallengeId())
+                    .orElseThrow(() -> new RuntimeException("Challenge not found"));
+
             User user = userRepository.findById(submission.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             user.setXp(user.getXp() + submission.getXpGained());
@@ -190,8 +207,55 @@ public class SubmissionService {
             user.setLevel(newLevel);
 
             userRepository.save(user);
+
+            // Add/update verified skill based on challenge technology
+            TechnologyType technology = mapChallengeLanguageToTechnology(submission.getLanguage());
+            if (technology != null) {
+                try {
+                    userSkillService.addOrUpdateVerifiedSkill(submission.getUserId(), technology);
+                    log.info("Added verified skill {} for user {}", technology, submission.getUserId());
+                } catch (Exception e) {
+                    log.warn("Failed to add verified skill: {}", e.getMessage());
+                }
+            }
+
+            // Trigger automatic social post if enabled
+            try {
+                socialTriggerService.triggerChallengeShare(
+                        submission.getUserId(),
+                        submission.getChallengeId(),
+                        challenge.getTitle(),
+                        submission.getXpGained()
+                );
+            } catch (Exception e) {
+                log.warn("Failed to trigger challenge share: {}", e.getMessage());
+            }
         }
 
         return SubmissionResponse.from(submission);
+    }
+
+    /**
+     * Map submission language to TechnologyType for user skills
+     */
+    private TechnologyType mapChallengeLanguageToTechnology(ProgrammingLanguage language) {
+        if (language == null) return null;
+
+        return switch (language) {
+            case JAVA -> TechnologyType.JAVA;
+            case PYTHON -> TechnologyType.PYTHON;
+            case JAVASCRIPT -> TechnologyType.JAVASCRIPT;
+            case TYPESCRIPT -> TechnologyType.TYPESCRIPT;
+            case GO -> TechnologyType.GO;
+            case RUST -> TechnologyType.RUST;
+            case C_SHARP -> TechnologyType.DOTNET;
+            case PHP -> TechnologyType.PHP;
+            case KOTLIN -> TechnologyType.KOTLIN;
+            case SWIFT -> TechnologyType.SWIFT;
+            case RUBY -> TechnologyType.RUBY;
+            case DART -> TechnologyType.FLUTTER;
+            case CPLUSPLUS -> null; // Could add C++ to TechnologyType
+            case OTHER -> null;
+        };
     }
 }

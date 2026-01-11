@@ -7,8 +7,15 @@ Forwards LlamaIndex logs to DeepTutor's unified logging system.
 """
 
 from contextlib import contextmanager
-import logging
 from typing import Optional
+
+# Use the stdlib logging that was pre-loaded in __init__.py
+import sys
+logging = sys.modules.get('_stdlib_logging')
+if logging is None:
+    # Fallback if _stdlib_logging not available
+    import importlib
+    logging = importlib.import_module('logging')
 
 
 class LlamaIndexLogForwarder(logging.Handler):

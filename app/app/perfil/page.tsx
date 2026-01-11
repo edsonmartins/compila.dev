@@ -14,6 +14,7 @@ import {
   Lock,
   Eye,
   EyeOff,
+  Code,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { refreshUser } from '@/lib/api';
+import { StackTab } from '@/components/app/perfil/StackTab';
+import { getAutoShareSetting, updateAutoShareSetting } from '@/lib/api/users';
 
 interface UserProfile {
   id: string;
@@ -40,7 +43,7 @@ interface UserProfile {
   email: string;
 }
 
-type TabType = 'profile' | 'settings' | 'security';
+type TabType = 'profile' | 'stack' | 'settings' | 'security';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -57,6 +60,7 @@ export default function ProfilePage() {
     new: '',
     confirm: '',
   });
+  const [autoShareEnabled, setAutoShareEnabled] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -81,6 +85,13 @@ export default function ProfilePage() {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    // Fetch auto-share setting
+    getAutoShareSetting()
+      .then((response) => setAutoShareEnabled(response.autoShare))
+      .catch(() => setAutoShareEnabled(false));
+  }, []);
 
   const handleSave = async () => {
     if (!editedProfile) return;
@@ -175,6 +186,18 @@ export default function ProfilePage() {
           )}
         >
           Perfil
+        </button>
+        <button
+          onClick={() => setActiveTab('stack')}
+          className={cn(
+            'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5',
+            activeTab === 'stack'
+              ? 'bg-white dark:bg-dark-card text-primary dark:text-dark-foreground shadow-sm'
+              : 'text-neutral-dark dark:text-dark-muted hover:text-primary dark:hover:text-dark-foreground'
+          )}
+        >
+          <Code className="h-4 w-4" />
+          Stack
         </button>
         <button
           onClick={() => setActiveTab('settings')}
@@ -505,6 +528,11 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* Stack Tab */}
+      {activeTab === 'stack' && (
+        <StackTab />
+      )}
+
       {/* Settings Tab */}
       {activeTab === 'settings' && (
         <div className="space-y-6 max-w-4xl">
@@ -529,6 +557,50 @@ export default function ProfilePage() {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-dark-card rounded-xl border border-neutral-light dark:border-dark-border p-6">
+            <h3 className="text-lg font-semibold text-primary dark:text-dark-foreground mb-4">
+              Preferências Sociais
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between py-3 border-b border-neutral-light dark:border-dark-border">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-gradient-to-br from-accent to-purple-500 rounded-lg">
+                    <span className="text-xl">🎉</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-primary dark:text-dark-foreground">Compartilhar conquistas automaticamente</p>
+                    <p className="text-sm text-neutral-dark dark:text-dark-muted">
+                      Crie posts automáticos no feed ao completar desafios ou ganhar conquistas
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    const newValue = !autoShareEnabled;
+                    try {
+                      await updateAutoShareSetting(newValue);
+                      setAutoShareEnabled(newValue);
+                      setMessage({ type: 'success', text: 'Configuração atualizada!' });
+                    } catch {
+                      setMessage({ type: 'error', text: 'Erro ao atualizar configuração.' });
+                    }
+                  }}
+                  className={cn(
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                    autoShareEnabled ? 'bg-accent' : 'bg-neutral-300 dark:bg-neutral-600'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'inline-block h-4 w-4 rounded-full bg-white transition',
+                      autoShareEnabled ? 'translate-x-6' : 'translate-x-1'
+                    )}
+                  />
+                </button>
+              </div>
             </div>
           </div>
 

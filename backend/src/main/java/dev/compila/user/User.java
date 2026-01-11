@@ -89,6 +89,10 @@ public class User extends BaseEntity {
     @Column(name = "last_active_at")
     private LocalDateTime lastActiveAt;
 
+    // Social settings
+    @Column(name = "auto_share_milestones")
+    private Boolean autoShareMilestones = false;
+
     // Constructors
     public User() {}
 
@@ -264,6 +268,14 @@ public class User extends BaseEntity {
 
     public void setLastActiveAt(LocalDateTime lastActiveAt) {
         this.lastActiveAt = lastActiveAt;
+    }
+
+    public Boolean getAutoShareMilestones() {
+        return autoShareMilestones;
+    }
+
+    public void setAutoShareMilestones(Boolean autoShareMilestones) {
+        this.autoShareMilestones = autoShareMilestones;
     }
 
     /**
