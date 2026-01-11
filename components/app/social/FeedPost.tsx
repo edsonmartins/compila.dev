@@ -29,7 +29,7 @@ interface FeedPostProps {
 }
 
 export function FeedPostComponent({ post, onComment, onShare }: FeedPostProps) {
-  const [localPost, setLocalPost] = React.useState(post);
+  const [localPost, setLocalPost] = React.useState<FeedPostResponse>(post);
 
   const handleKudoChange = async (response: KudoResponse) => {
     setLocalPost({
@@ -141,40 +141,49 @@ export function FeedPostComponent({ post, onComment, onShare }: FeedPostProps) {
       <div className="px-4 pb-4">
         {/* Challenge Info */}
         {localPost.type === PostType.CHALLENGE_COMPLETED &&
-          localPost.metadata?.challengeTitle && (
+          localPost.metadata &&
+          'challengeTitle' in localPost.metadata &&
+          typeof localPost.metadata.challengeTitle === 'string' && (
             <div className="mb-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-yellow-500" />
                 <div>
                   <p className="font-medium text-neutral-900 dark:text-dark-foreground">
-                    {localPost.metadata.challengeTitle as string}
+                    {localPost.metadata.challengeTitle}
                   </p>
-                  {(localPost.metadata.xpGained as number) && (
-                    <p className="text-sm text-green-600 dark:text-green-400">
-                      +{localPost.metadata.xpGained as number} XP ganhos
-                    </p>
-                  )}
+                  {'xpGained' in localPost.metadata &&
+                    typeof localPost.metadata.xpGained === 'number' && (
+                      <p className="text-sm text-green-600 dark:text-green-400">
+                        +{localPost.metadata.xpGained} XP ganhos
+                      </p>
+                    )}
                 </div>
               </div>
             </div>
           )}
 
         {/* Badge Info */}
-        {localPost.type === PostType.ACHIEVEMENT && localPost.metadata?.badgeName && (
-          <div className="mb-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">
-                {localPost.metadata.badgeIcon as string}
-              </span>
-              <div>
-                <p className="font-medium text-neutral-900 dark:text-dark-foreground">
-                  Conquista desbloqueada:{' '}
-                  {localPost.metadata.badgeName as string}
-                </p>
+        {localPost.type === PostType.ACHIEVEMENT &&
+          localPost.metadata &&
+          'badgeName' in localPost.metadata &&
+          typeof localPost.metadata.badgeName === 'string' && (
+            <div className="mb-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">
+                  {'badgeIcon' in localPost.metadata &&
+                    typeof localPost.metadata.badgeIcon === 'string'
+                    ? localPost.metadata.badgeIcon
+                    : '⭐'}
+                </span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-dark-foreground">
+                    Conquista desbloqueada:{' '}
+                    {localPost.metadata.badgeName}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Text Content */}
         <p className="text-neutral-700 dark:text-dark-foreground whitespace-pre-wrap mb-3">

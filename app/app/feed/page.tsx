@@ -10,7 +10,7 @@ import {
   Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import FeedPostComponent, { FeedPostResponse } from '@/components/app/social/FeedPost';
+import FeedPostComponent from '@/components/app/social/FeedPost';
 import { CreatePostDialog } from '@/components/app/social/CreatePostDialog';
 import {
   getFeed,
@@ -20,6 +20,7 @@ import {
   createPost as createPostApi,
   CreatePostRequest,
   PostType,
+  FeedPostResponse,
 } from '@/lib/api/social';
 import { cn } from '@/lib/utils';
 

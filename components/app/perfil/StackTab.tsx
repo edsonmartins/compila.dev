@@ -10,7 +10,7 @@ import {
   Smartphone,
   Wrench,
   Database,
-  Tool,
+  Wrench as Tool,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
