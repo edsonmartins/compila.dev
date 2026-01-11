@@ -158,12 +158,14 @@ console.log(helloWorld());`,
       status: response.status.toLowerCase() as any,
       score: response.score,
       xpGained: response.xpGained,
-      testResults: (response.testResults as any[])?.map((t: any) => ({
-        passed: t.passed,
-        name: t.name,
-        error: t.error,
-        output: t.output,
-      })) || [],
+      testResults: Array.isArray(response.testResults)
+        ? response.testResults.map((t: any) => ({
+            passed: t.passed,
+            name: t.name,
+            error: t.error,
+            output: t.output,
+          }))
+        : [],
       aiFeedback: response.aiFeedback?.message || response.aiFeedback?.suggestions?.join('\n'),
     };
   }, [challenge]);

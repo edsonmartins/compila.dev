@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
 import { Check } from "lucide-react";
 
@@ -167,7 +167,7 @@ function PricingCard({
 
       <Button
         className={variant === "highlighted" ? "w-full" : "w-full"}
-        variant={variant === "highlighted" ? "primary" : "secondary"}
+        variant={variant === "highlighted" ? "default" : "secondary"}
         size="lg"
       >
         {cta}
