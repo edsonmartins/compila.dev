@@ -74,7 +74,7 @@ public class User extends BaseEntity {
     // Subscription
     @Column(name = "subscription_plan", length = 20)
     @Enumerated(EnumType.STRING)
-    private SubscriptionPlan subscriptionPlan = SubscriptionPlan.free;
+    private SubscriptionPlan subscriptionPlan = SubscriptionPlan.FREE;
 
     @Column(name = "subscription_expires_at")
     private LocalDateTime subscriptionExpiresAt;
@@ -270,8 +270,8 @@ public class User extends BaseEntity {
      * Subscription plan enum
      */
     public enum SubscriptionPlan {
-        free,
-        pro,
-        pro_plus
+        FREE,
+        PRO,
+        PRO_PLUS
     }
 }
