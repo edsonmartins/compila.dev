@@ -86,7 +86,7 @@ server:
 
 # JWT
 jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits}
+  secret: ${JWT_SECRET:compila-dev-secret-key-must-be-at-least-512-bits-long-for-hs512-algorithm-to-work-properly}
   expiration: ${JWT_EXPIRATION:86400000} # 24 hours
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
 

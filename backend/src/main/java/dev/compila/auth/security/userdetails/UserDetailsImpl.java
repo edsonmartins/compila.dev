@@ -66,7 +66,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email; // Use email as the username for authentication
     }
 
     @Override
