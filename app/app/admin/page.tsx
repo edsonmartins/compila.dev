@@ -200,7 +200,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-dark-bg">
+    <div className="min-h-screen bg-neutral-50 dark:bg-dark-background">
       {/* Header */}
       <header className="bg-white dark:bg-dark-card border-b border-neutral-200 dark:border-dark-border">
         <div className="container mx-auto px-4 py-6">

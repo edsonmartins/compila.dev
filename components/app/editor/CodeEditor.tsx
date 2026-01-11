@@ -132,7 +132,7 @@ export function CodeEditor({
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as Language)}
-            className="px-3 py-1.5 bg-white dark:bg-dark-bg border border-neutral-300 dark:border-dark-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            className="px-3 py-1.5 bg-white dark:bg-dark-background border border-neutral-300 dark:border-dark-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-accent"
             disabled={readOnly}
           >
             {availableLanguages.map((lang) => {

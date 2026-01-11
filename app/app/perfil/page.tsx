@@ -270,7 +270,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 p-4 bg-neutral-light/30 dark:bg-dark-bg rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 p-4 bg-neutral-light/30 dark:bg-dark-background rounded-lg">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-accent">{editedProfile.level}</p>
                   <p className="text-sm text-neutral-dark dark:text-dark-muted">Nível</p>

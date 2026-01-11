@@ -222,7 +222,7 @@ console.log(helloWorld());`,
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white dark:bg-dark-bg">
+    <div className="h-screen flex flex-col bg-white dark:bg-dark-background">
       {/* Header */}
       <header className="border-b border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-card">
         <div className="flex items-center justify-between px-4 py-3">

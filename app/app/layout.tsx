@@ -16,7 +16,7 @@ export default function AppLayout({
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-dark-bg flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 dark:bg-dark-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent" />
       </div>
     );
@@ -25,7 +25,7 @@ export default function AppLayout({
   // If no user, the AuthProvider will redirect to login
   if (!user) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-dark-bg flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 dark:bg-dark-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent" />
       </div>
     );

@@ -157,7 +157,7 @@ export default function UserProfilePage() {
   const levelProgress = (currentLevelXp / 1000) * 100;
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-dark-bg">
+    <div className="min-h-screen bg-neutral-50 dark:bg-dark-background">
       {/* Header Banner */}
       <div className="h-48 bg-gradient-to-r from-primary to-accent" />
 

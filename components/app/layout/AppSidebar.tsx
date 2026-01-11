@@ -20,7 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface NavItem {
   label: string;
@@ -80,7 +80,7 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-50 dark:bg-dark-bg overflow-hidden">
+    <div className="flex h-screen bg-neutral-50 dark:bg-dark-background overflow-hidden">
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div

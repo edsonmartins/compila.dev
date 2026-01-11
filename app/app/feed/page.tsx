@@ -144,7 +144,7 @@ export default function FeedPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-dark-bg">
+    <div className="min-h-screen bg-neutral-50 dark:bg-dark-background">
       {/* Header */}
       <header className="bg-white dark:bg-dark-card border-b border-neutral-200 dark:border-dark-border sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
