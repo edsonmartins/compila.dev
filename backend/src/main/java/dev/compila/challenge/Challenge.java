@@ -1,12 +1,16 @@
 package dev.compila.challenge;
 
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 import dev.compila.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Challenge entity
@@ -79,14 +83,18 @@ public class Challenge extends BaseEntity {
     private Integer attemptedCount = 0;
 
     @Column(name = "success_rate")
-    private Double successRate;
+    private BigDecimal successRate;
 
     // Publishing
-    @Column(name = "published_at")
-    private LocalDateTime publishedAt;
+    @Column(name = "published")
+    private Boolean published = false;
 
-    @Column(name = "created_by")
-    private String createdBy;
+    @Column(name = "featured")
+    private Boolean featured = false;
+
+    // Author (matches schema)
+    @Column(name = "author_id")
+    private UUID authorId;
 
     // Constructors
     public Challenge() {}
@@ -233,50 +241,35 @@ public class Challenge extends BaseEntity {
         this.attemptedCount = attemptedCount;
     }
 
-    public Double getSuccessRate() {
+    public BigDecimal getSuccessRate() {
         return successRate;
     }
 
-    public void setSuccessRate(Double successRate) {
+    public void setSuccessRate(BigDecimal successRate) {
         this.successRate = successRate;
     }
 
-    public LocalDateTime getPublishedAt() {
-        return publishedAt;
+    public UUID getAuthorId() {
+        return authorId;
     }
 
-    public void setPublishedAt(LocalDateTime publishedAt) {
-        this.publishedAt = publishedAt;
+    public void setAuthorId(UUID authorId) {
+        this.authorId = authorId;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public Boolean getPublished() {
+        return published;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
-    /**
-     * Challenge stack enum
-     */
-    public enum ChallengeStack {
-        frontend,
-        backend,
-        mobile,
-        devops,
-        iot,
-        data
+    public Boolean getFeatured() {
+        return featured;
     }
 
-    /**
-     * Challenge level enum
-     */
-    public enum ChallengeLevel {
-        beginner,
-        junior,
-        mid,
-        senior,
-        expert
+    public void setFeatured(Boolean featured) {
+        this.featured = featured;
     }
 }

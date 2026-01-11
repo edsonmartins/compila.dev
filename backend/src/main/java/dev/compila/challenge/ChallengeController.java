@@ -3,8 +3,9 @@ package dev.compila.challenge;
 import dev.compila.challenge.dto.ChallengeRequest;
 import dev.compila.challenge.dto.ChallengeResponse;
 import dev.compila.challenge.dto.ChallengeSummaryResponse;
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +19,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/challenges")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ChallengeController {
 
     private final ChallengeService challengeService;
+
+    public ChallengeController(ChallengeService challengeService) {
+        this.challengeService = challengeService;
+    }
 
     @GetMapping
     public ResponseEntity<Page<ChallengeSummaryResponse>> findAll(

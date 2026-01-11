@@ -3,7 +3,8 @@ package dev.compila.challenge;
 import dev.compila.challenge.dto.ChallengeRequest;
 import dev.compila.challenge.dto.ChallengeResponse;
 import dev.compila.challenge.dto.ChallengeSummaryResponse;
-import lombok.RequiredArgsConstructor;
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+
+    public ChallengeService(ChallengeRepository challengeRepository) {
+        this.challengeRepository = challengeRepository;
+    }
 
     public List<ChallengeSummaryResponse> findAllPublished() {
         return challengeRepository.findAllPublished().stream()
@@ -107,14 +111,14 @@ public class ChallengeService {
         challenge.setStack(request.stack());
         challenge.setLevel(request.level());
         challenge.setDifficulty(request.difficulty());
-        challenge.setTechnologies(request.technologies());
-        challenge.setTags(request.tags());
-        challenge.setRequirements(request.requirements());
-        challenge.setStarterCode(request.starterCode());
-        challenge.setSolutionCode(request.solutionCode());
+        challenge.setTechnologies(request.technologies() != null ? request.technologies().toArray(new String[0]) : null);
+        challenge.setTags(request.tags() != null ? request.tags().toArray(new String[0]) : null);
+        challenge.setRequirements(request.requirements() != null ? request.requirements().toString() : null);
+        challenge.setStarterCode(request.starterCode() != null ? request.starterCode().toString() : null);
+        challenge.setSolutionCode(request.solutionCode() != null ? request.solutionCode().toString() : null);
         challenge.setXpReward(request.xpReward());
         challenge.setEstimatedTimeMinutes(request.estimatedTimeMinutes());
-        challenge.setBadges(request.badges());
+        challenge.setBadges(request.badges() != null ? request.badges().toArray(new String[0]) : null);
         challenge.setPublished(request.published());
         challenge.setFeatured(request.featured());
     }

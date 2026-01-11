@@ -2,7 +2,7 @@ package dev.compila.gamification;
 
 import dev.compila.gamification.dto.BadgeResponse;
 import dev.compila.gamification.dto.UserStatsResponse;
-import lombok.RequiredArgsConstructor;
+import dev.compila.gamification.enums.BadgeType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +11,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/gamification")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class GamificationController {
 
     private final GamificationService gamificationService;
+
+    public GamificationController(GamificationService gamificationService) {
+        this.gamificationService = gamificationService;
+    }
 
     @GetMapping("/stats/{userId}")
     public ResponseEntity<UserStatsResponse> getUserStats(@PathVariable UUID userId) {
@@ -32,7 +35,7 @@ public class GamificationController {
             @PathVariable UUID userId,
             @PathVariable String badgeType
     ) {
-        return ResponseEntity.ok(gamificationService.awardBadge(userId, gamification.enums.BadgeType.valueOf(badgeType)));
+        return ResponseEntity.ok(gamificationService.awardBadge(userId, BadgeType.valueOf(badgeType)));
     }
 
     @PostMapping("/xp/{userId}")

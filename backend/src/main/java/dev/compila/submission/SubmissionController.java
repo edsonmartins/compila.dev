@@ -3,7 +3,6 @@ package dev.compila.submission;
 import dev.compila.submission.dto.SubmitRequest;
 import dev.compila.submission.dto.SubmissionResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +15,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/submissions")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class SubmissionController {
 
     private final SubmissionService submissionService;
+
+    public SubmissionController(SubmissionService submissionService) {
+        this.submissionService = submissionService;
+    }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<SubmissionResponse>> findByUserId(

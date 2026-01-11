@@ -1,7 +1,7 @@
 package dev.compila.challenge.dto;
 
-import dev.compila.challenge.ChallengeLevel;
-import dev.compila.challenge.ChallengeStack;
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

@@ -5,7 +5,6 @@ import dev.compila.gamification.dto.UserStatsResponse;
 import dev.compila.gamification.enums.BadgeType;
 import dev.compila.user.User;
 import dev.compila.user.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +13,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class GamificationService {
 
     private final UserBadgeRepository userBadgeRepository;
     private final UserRepository userRepository;
+
+    public GamificationService(UserBadgeRepository userBadgeRepository, UserRepository userRepository) {
+        this.userBadgeRepository = userBadgeRepository;
+        this.userRepository = userRepository;
+    }
 
     public List<BadgeResponse> getUserBadges(UUID userId) {
         return userBadgeRepository.findByUserIdOrderByEarnedAtDesc(userId).stream()

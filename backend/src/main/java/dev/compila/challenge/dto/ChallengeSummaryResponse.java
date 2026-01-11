@@ -1,9 +1,10 @@
 package dev.compila.challenge.dto;
 
 import dev.compila.challenge.Challenge;
-import dev.compila.challenge.ChallengeLevel;
-import dev.compila.challenge.ChallengeStack;
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public record ChallengeSummaryResponse(
             challenge.getStack(),
             challenge.getLevel(),
             challenge.getDifficulty(),
-            challenge.getTechnologies(),
+            challenge.getTechnologies() != null ? Arrays.asList(challenge.getTechnologies()) : List.of(),
             challenge.getXpReward(),
             challenge.getEstimatedTimeMinutes(),
             challenge.getCompletedCount(),

@@ -1,10 +1,11 @@
 package dev.compila.challenge.dto;
 
 import dev.compila.challenge.Challenge;
-import dev.compila.challenge.ChallengeLevel;
-import dev.compila.challenge.ChallengeStack;
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -41,13 +42,13 @@ public record ChallengeResponse(
             challenge.getStack(),
             challenge.getLevel(),
             challenge.getDifficulty(),
-            challenge.getTechnologies(),
-            challenge.getTags(),
-            challenge.getRequirements(),
-            challenge.getStarterCode(),
+            challenge.getTechnologies() != null ? Arrays.asList(challenge.getTechnologies()) : List.of(),
+            challenge.getTags() != null ? Arrays.asList(challenge.getTags()) : List.of(),
+            Map.of(), // TODO: Parse JSON from challenge.getRequirements()
+            Map.of(), // TODO: Parse JSON from challenge.getStarterCode()
             challenge.getXpReward(),
             challenge.getEstimatedTimeMinutes(),
-            challenge.getBadges(),
+            challenge.getBadges() != null ? Arrays.asList(challenge.getBadges()) : List.of(),
             challenge.getCompletedCount(),
             challenge.getAttemptedCount(),
             challenge.getSuccessRate() != null ? challenge.getSuccessRate().doubleValue() : null,

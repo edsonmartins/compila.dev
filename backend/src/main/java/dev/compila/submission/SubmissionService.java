@@ -7,7 +7,6 @@ import dev.compila.submission.dto.SubmissionResponse;
 import dev.compila.submission.enums.SubmissionStatus;
 import dev.compila.user.User;
 import dev.compila.user.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class SubmissionService {
 
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
+
+    public SubmissionService(SubmissionRepository submissionRepository, UserRepository userRepository, ChallengeRepository challengeRepository) {
+        this.submissionRepository = submissionRepository;
+        this.userRepository = userRepository;
+        this.challengeRepository = challengeRepository;
+    }
 
     public Page<SubmissionResponse> findByUserId(UUID userId, Pageable pageable) {
         return submissionRepository.findByUserId(userId, pageable)

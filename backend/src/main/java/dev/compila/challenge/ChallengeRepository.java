@@ -1,11 +1,15 @@
 package dev.compila.challenge;
 
+import dev.compila.challenge.enums.ChallengeLevel;
+import dev.compila.challenge.enums.ChallengeStack;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,4 +44,14 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 
     @Query("SELECT c FROM Challenge c WHERE c.level = :level AND c.published = true ORDER BY c.createdAt DESC")
     List<Challenge> findByLevelPublished(@Param("level") ChallengeLevel level);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Challenge c SET c.attemptedCount = c.attemptedCount + 1 WHERE c.id = :id")
+    void incrementAttemptedCount(@Param("id") UUID id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Challenge c SET c.completedCount = c.completedCount + 1 WHERE c.id = :id")
+    void incrementCompletedCount(@Param("id") UUID id);
 }

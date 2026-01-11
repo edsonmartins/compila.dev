@@ -3,12 +3,17 @@
 spring:
   application:
     name: compila-dev
+  main:
+    allow-circular-references: true
+  docker:
+    compose:
+      enabled: false
 
   # Database
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/compila_dev}
-    username: ${DB_USER:compila}
-    password: ${DB_PASSWORD:compila_dev}
+    url: ${DB_URL:jdbc:postgresql://192.168.1.110:5444/compiladev?ssl=false&serverTimezone=America/Sao_Paulo}
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:Rapidex@727204}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -18,7 +23,7 @@ spring:
   # JPA
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:

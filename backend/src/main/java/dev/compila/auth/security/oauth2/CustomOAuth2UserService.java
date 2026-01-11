@@ -1,22 +1,27 @@
 package dev.compila.auth.security.oauth2;
 
-import dev.compila.auth.security.userdetails.UserDetailsImpl;
 import dev.compila.user.User;
 import dev.compila.user.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+
+    public CustomOAuth2UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -45,7 +50,27 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = registerNewUser(registrationId, oAuth2UserInfo);
         }
 
-        return UserDetailsImpl.build(user);
+        // Create a new OAuth2User with the user ID added
+        Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
+        attributes.put("userId", user.getId().toString());
+        attributes.put("dbId", user.getId());
+
+        return new OAuth2User() {
+            @Override
+            public Map<String, Object> getAttributes() {
+                return attributes;
+            }
+
+            @Override
+            public Collection<? extends GrantedAuthority> getAuthorities() {
+                return oAuth2User.getAuthorities();
+            }
+
+            @Override
+            public String getName() {
+                return oAuth2User.getName();
+            }
+        };
     }
 
     private User registerNewUser(String registrationId, OAuth2UserInfo oAuth2UserInfo) {

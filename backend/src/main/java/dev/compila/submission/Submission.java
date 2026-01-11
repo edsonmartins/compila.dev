@@ -6,6 +6,7 @@ import dev.compila.submission.enums.SubmissionStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class Submission extends BaseEntity {
     @Column(nullable = false, length = 20)
     private ProgrammingLanguage language;
 
+    @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> files;
 
@@ -42,6 +44,7 @@ public class Submission extends BaseEntity {
     @Column(nullable = false, length = 20)
     private SubmissionStatus status = SubmissionStatus.PENDING;
 
+    @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> testResults;
 
@@ -52,6 +55,7 @@ public class Submission extends BaseEntity {
     private Integer xpGained = 0;
 
     // AI Feedback
+    @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> aiFeedback;
 

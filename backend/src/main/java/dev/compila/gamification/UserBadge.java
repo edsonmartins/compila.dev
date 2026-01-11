@@ -3,8 +3,6 @@ package dev.compila.gamification;
 import dev.compila.common.BaseEntity;
 import dev.compila.gamification.enums.BadgeType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,8 +12,6 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "user_badges")
-@Getter
-@Setter
 public class UserBadge extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
@@ -34,5 +30,30 @@ public class UserBadge extends BaseEntity {
         this.userId = userId;
         this.badgeType = badgeType;
         this.earnedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public BadgeType getBadgeType() {
+        return badgeType;
+    }
+
+    public void setBadgeType(BadgeType badgeType) {
+        this.badgeType = badgeType;
+    }
+
+    public LocalDateTime getEarnedAt() {
+        return earnedAt;
+    }
+
+    public void setEarnedAt(LocalDateTime earnedAt) {
+        this.earnedAt = earnedAt;
     }
 }
