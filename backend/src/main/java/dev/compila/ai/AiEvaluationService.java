@@ -1,6 +1,5 @@
 package dev.compila.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.compila.ai.config.AiServiceConfig;
 import dev.compila.ai.dto.*;
@@ -19,6 +18,7 @@ import java.util.List;
 public class AiEvaluationService {
 
     private static final Logger log = LoggerFactory.getLogger(AiEvaluationService.class);
+    private static final String COMPILA_API_PREFIX = "/api/v1/compila";
 
     private final WebClient webClient;
     private final AiServiceConfig config;
@@ -36,6 +36,7 @@ public class AiEvaluationService {
 
     /**
      * Evaluate code submission against test cases
+     * Calls the AI Service's /api/v1/compila/evaluate endpoint
      */
     public CodeEvaluationResponse evaluateCode(CodeEvaluationRequest request) {
         if (!config.isEnabled()) {
@@ -44,12 +45,24 @@ public class AiEvaluationService {
         }
 
         try {
-            return webClient.post()
-                    .uri("/api/evaluate")
-                    .bodyValue(request)
+            // Build request body for AI Service
+            AiServiceEvaluateRequest body = new AiServiceEvaluateRequest(
+                    request.code(),
+                    request.language(),
+                    request.problemStatement(),
+                    convertTestCases(request.testCases()),
+                    request.constraints()
+            );
+
+            AiServiceEvaluateResponse response = webClient.post()
+                    .uri(COMPILA_API_PREFIX + "/evaluate")
+                    .bodyValue(body)
                     .retrieve()
-                    .bodyToMono(CodeEvaluationResponse.class)
+                    .bodyToMono(AiServiceEvaluateResponse.class)
                     .block(Duration.ofMillis(config.getTimeout().toMillis()));
+
+            return convertResponse(response);
+
         } catch (WebClientResponseException e) {
             log.error("AI service returned error: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
             return createErrorEvaluationResponse("Service temporarily unavailable");
@@ -60,7 +73,7 @@ public class AiEvaluationService {
     }
 
     /**
-     * Analyze code quality, security, or performance
+     * Analyze code quality without running tests
      */
     public CodeAnalysisResponse analyzeCode(CodeAnalysisRequest request) {
         if (!config.isEnabled()) {
@@ -69,12 +82,37 @@ public class AiEvaluationService {
         }
 
         try {
-            return webClient.post()
-                    .uri("/api/analyze")
-                    .bodyValue(request)
+            AiServiceEvaluateRequest body = new AiServiceEvaluateRequest(
+                    request.code(),
+                    request.language(),
+                    request.code(), // Use code as problem_statement since not available
+                    List.of(),
+                    null
+            );
+
+            AiServiceFeedback feedback = webClient.post()
+                    .uri(COMPILA_API_PREFIX + "/analyze")
+                    .bodyValue(body)
                     .retrieve()
-                    .bodyToMono(CodeAnalysisResponse.class)
+                    .bodyToMono(AiServiceFeedback.class)
                     .block(Duration.ofMillis(config.getTimeout().toMillis()));
+
+            return new CodeAnalysisResponse(
+                    feedback.overall_score(),
+                    feedback.strengths().isEmpty() ? "Code submitted" : String.join(", ", feedback.strengths()),
+                    List.of(), // issues - not used in new format
+                    List.of(new CodeAnalysisResponse.Suggestion(
+                            "improvement",
+                            String.join(", ", feedback.improvements()),
+                            null
+                    )),
+                    new CodeAnalysisResponse.ComplexityMetrics(
+                            5,
+                            request.code().split("\n").length,
+                            3
+                    )
+            );
+
         } catch (WebClientResponseException e) {
             log.error("AI service returned error: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
             return createErrorAnalysisResponse("Service temporarily unavailable");
@@ -85,7 +123,7 @@ public class AiEvaluationService {
     }
 
     /**
-     * Generate a hint for a coding challenge without giving away the solution
+     * Generate a hint for a coding challenge
      */
     public String generateHint(String problemStatement, String userCode, String language) {
         if (!config.isEnabled()) {
@@ -93,15 +131,23 @@ public class AiEvaluationService {
         }
 
         try {
-            HintRequest request = new HintRequest(problemStatement, userCode, language);
-            HintResponse response = webClient.post()
-                    .uri("/api/hint")
-                    .bodyValue(request)
+            AiServiceEvaluateRequest body = new AiServiceEvaluateRequest(
+                    userCode,
+                    language,
+                    problemStatement,
+                    List.of(),
+                    null
+            );
+
+            AiServiceFeedback feedback = webClient.post()
+                    .uri(COMPILA_API_PREFIX + "/analyze")
+                    .bodyValue(body)
                     .retrieve()
-                    .bodyToMono(HintResponse.class)
+                    .bodyToMono(AiServiceFeedback.class)
                     .block(Duration.ofMillis(config.getTimeout().toMillis()));
 
-            return response != null ? response.hint() : "Unable to generate hint at this time.";
+            return feedback.hint() != null ? feedback.hint() : "Continue practicing!";
+
         } catch (Exception e) {
             log.error("Failed to generate hint", e);
             return "Unable to generate hint at this time.";
@@ -114,7 +160,7 @@ public class AiEvaluationService {
     public boolean isHealthy() {
         try {
             return webClient.get()
-                    .uri("/health")
+                    .uri(COMPILA_API_PREFIX + "/health")
                     .retrieve()
                     .bodyToMono(String.class)
                     .map("OK"::equals)
@@ -122,6 +168,113 @@ public class AiEvaluationService {
         } catch (Exception e) {
             log.warn("AI service health check failed", e);
             return false;
+        }
+    }
+
+    private List<AiServiceTestCase> convertTestCases(List<String> testCases) {
+        if (testCases == null) return List.of();
+        return testCases.stream()
+                .map(tc -> new AiServiceTestCase(tc, "", false))
+                .toList();
+    }
+
+    private CodeEvaluationResponse convertResponse(AiServiceEvaluateResponse response) {
+        List<CodeEvaluationResponse.TestResult> testResults = response.testResults().stream()
+                .map(tr -> new CodeEvaluationResponse.TestResult(
+                        tr.test_name(),
+                        tr.passed(),
+                        tr.expected_output(),
+                        tr.actual_output(),
+                        tr.error_message()
+                ))
+                .toList();
+
+        return new CodeEvaluationResponse(
+                response.success(),
+                response.feedback().overall_score,
+                response.feedback().strengths().isEmpty() ? "Evaluation completed" : String.join(", ", response.feedback().strengths()),
+                List.of(),
+                response.feedback().improvements(),
+                testResults,
+                response.feedback().hint
+        );
+    }
+
+    // DTOs for AI Service communication
+    public record AiServiceEvaluateRequest(
+            String code,
+            String language,
+            String problem_statement,
+            List<AiServiceTestCase> test_cases,
+            Object constraints
+    ) {}
+
+    public record AiServiceTestCase(
+            String input_data,
+            String expected_output,
+            boolean is_hidden
+    ) {}
+
+    public record AiServiceEvaluateResponse(
+            boolean success,
+            int passed_tests,
+            int total_tests,
+            List<AiServiceTestResult> test_results,
+            AiServiceFeedback feedback,
+            Integer execution_time_ms
+    ) {
+        public AiServiceFeedback feedback() {
+            return feedback;
+        }
+        public List<AiServiceTestResult> testResults() {
+            return test_results;
+        }
+        public boolean success() {
+            return success;
+        }
+    }
+
+    public record AiServiceTestResult(
+            String test_name,
+            boolean passed,
+            String expected_output,
+            String actual_output,
+            String error_message,
+            boolean is_hidden
+    ) {
+        public String testName() {
+            return test_name;
+        }
+        public boolean passed() {
+            return passed;
+        }
+        public String expectedOutput() {
+            return expected_output;
+        }
+        public String actualOutput() {
+            return actual_output;
+        }
+        public String errorMessage() {
+            return error_message;
+        }
+    }
+
+    public record AiServiceFeedback(
+            int overall_score,
+            List<String> strengths,
+            List<String> improvements,
+            List<String> best_practices,
+            String complexity_analysis,
+            String hint
+            ) {
+        public int overall_score() {
+            return overall_score;
+        }
+        public List<String> strengths() {
+            return strengths;
+        }
+        public List<String> improvements() {
+            return improvements;
         }
     }
 
@@ -176,12 +329,4 @@ public class AiEvaluationService {
                 new CodeAnalysisResponse.ComplexityMetrics(0, 0, 0)
         );
     }
-
-    private record HintRequest(
-            String problemStatement,
-            String userCode,
-            String language
-    ) {}
-
-    private record HintResponse(String hint) {}
 }

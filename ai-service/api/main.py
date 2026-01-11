@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from src.api.routers import (
     agent_config,
     chat,
+    code_evaluation,
     co_writer,
     dashboard,
     embedding_provider,
@@ -86,6 +87,7 @@ app.include_router(system.router, prefix="/api/v1/system", tags=["system"])
 app.include_router(llm_provider.router, prefix="/api/v1/config/llm", tags=["config"])
 app.include_router(embedding_provider.router, prefix="/api/v1/config/embedding", tags=["config"])
 app.include_router(agent_config.router, prefix="/api/v1/config", tags=["config"])
+app.include_router(code_evaluation.router, prefix="/api/v1/compila", tags=["compila"])
 
 
 @app.get("/")
