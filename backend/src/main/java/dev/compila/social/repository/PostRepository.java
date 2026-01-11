@@ -25,12 +25,12 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     Page<Post> findByPublishedTrueOrderByCreatedAtDesc(Pageable pageable);
 
     /**
-     * Find trending posts based on kudos engagement
+     * Find trending posts based on weighted kudos engagement
+     * FIRE and ROCKET are worth 5x, CLEAN 4x, LIGHTBULB and TARGET 3x, PAIR 2x
      */
     @Query("SELECT p FROM Post p WHERE p.published = true ORDER BY " +
-           "((p.fireCount * 5.0) + (p.rocketCount * 5.0) + (p.cleanCount * 4.0) + " +
-           "(p.lightbulbCount * 3.0) + (p.targetCount * 3.0) + (p.pairCount * 2.0)) / " +
-           "FUNCTION('AGE', HOUR, p.publishedAt, p.createdAt) / 24.0 + 1.0) DESC")
+           "((p.fireCount * 5) + (p.rocketCount * 5) + (p.cleanCount * 4) + " +
+           "(p.lightbulbCount * 3) + (p.targetCount * 3) + (p.pairCount * 2)) DESC")
     Page<Post> findTrending(Pageable pageable);
 
     /**
@@ -134,7 +134,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     /**
      * Mark post as solved
      */
-    @Query("UPDATE Post p SET p.isSolved = true, p.solutionPostId = :solutionCommentId WHERE p.id = :postId")
+    @Query("UPDATE Post p SET p.isSolved = true, p.solutionCommentId = :solutionCommentId WHERE p.id = :postId")
     void markAsSolved(@Param("postId") UUID postId, @Param("solutionCommentId") UUID solutionCommentId);
 
     /**

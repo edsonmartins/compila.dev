@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home,
-  Code,
   BookOpen,
   Briefcase,
   Users,
@@ -31,11 +30,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/app/dashboard', icon: Home },
-  { label: 'Desafios', href: '/app/desafios', icon: Code },
+  { label: 'Desafios', href: '/app/desafios', icon: Trophy },
   { label: 'Trilhas', href: '/app/trilhas', icon: BookOpen },
   { label: 'Vagas', href: '/app/vagas', icon: Briefcase },
   { label: 'Feed', href: '/app/feed', icon: Users, badge: 3 },
-  { label: 'Ranking', href: '/app/ranking', icon: Trophy },
+  { label: 'Ranking', href: '/app/ranking', icon: Zap },
 ];
 
 const bottomNavItems: NavItem[] = [
@@ -98,23 +97,24 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-dark-border">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 dark:border-dark-border">
           {!isCollapsed && (
             <Link href="/app/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-                <Code className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold text-lg text-neutral-900 dark:text-dark-foreground">
-                  Compila.dev
-                </h1>
-              </div>
+              <img
+                src="/images/compila-dev.png"
+                alt="Compila.dev"
+                className="h-10 w-auto"
+              />
             </Link>
           )}
           {isCollapsed && (
-            <div className="h-10 w-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mx-auto">
-              <Code className="h-6 w-6 text-white" />
-            </div>
+            <Link href="/app/dashboard" className="mx-auto">
+              <img
+                src="/images/compila-dev_single.png"
+                alt="Compila.dev"
+                className="h-10 w-auto"
+              />
+            </Link>
           )}
 
           {/* Mobile Close Button */}
@@ -281,14 +281,11 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <Code className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-bold text-neutral-900 dark:text-dark-foreground">
-              Compila.dev
-            </span>
-          </div>
+          <img
+            src="/images/compila-dev.png"
+            alt="Compila.dev"
+            className="h-8 w-auto"
+          />
           <Link href="/app/perfil">
             <Avatar className="h-8 w-8">
               <AvatarImage src={mockUser.avatarUrl} alt={mockUser.username} />

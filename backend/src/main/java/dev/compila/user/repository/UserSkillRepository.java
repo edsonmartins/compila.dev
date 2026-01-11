@@ -51,12 +51,6 @@ public interface UserSkillRepository extends JpaRepository<UserSkill, UUID> {
     long countVerifiedSkillsByUserId(@Param("userId") UUID userId);
 
     /**
-     * Find skills by category for a user
-     */
-    @Query("SELECT us FROM UserSkill us WHERE us.userId = :userId AND us.technology.category = :category ORDER BY us.challengesCount DESC")
-    List<UserSkill> findByUserIdAndCategory(@Param("userId") UUID userId, @Param("category") String category);
-
-    /**
      * Delete a user's skill
      */
     void deleteByUserIdAndTechnology(UUID userId, TechnologyType technology);

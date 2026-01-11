@@ -15,11 +15,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/users/settings")
 @CrossOrigin(origins = "*")
-public class UserController {
+public class UserSettingsController {
 
     private final UserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserSettingsController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

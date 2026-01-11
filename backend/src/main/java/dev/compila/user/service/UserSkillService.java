@@ -48,7 +48,9 @@ public class UserSkillService {
      * Get skills grouped by category
      */
     public List<UserSkill> getSkillsByCategory(UUID userId, String category) {
-        return userSkillRepository.findByUserIdAndCategory(userId, category);
+        return userSkillRepository.findByUserId(userId).stream()
+                .filter(skill -> skill.getTechnology().getCategory().equals(category))
+                .toList();
     }
 
     /**
