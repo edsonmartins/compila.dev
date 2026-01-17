@@ -1,0 +1,17 @@
+:root {
+  --ifm-color-primary: #0f2a44;
+  --ifm-color-primary-dark: #0a1e30;
+  --ifm-color-primary-darker: #071625;
+  --ifm-color-primary-light: #1a3a5c;
+  --ifm-color-primary-lighter: #244a73;
+  --ifm-background-color: #ffffff;
+  --ifm-font-family-base: 'Inter', 'Segoe UI', sans-serif;
+}
+
+body {
+  color: #1f2933;
+}
+
+.navbar__title {
+  font-weight: 700;
+}

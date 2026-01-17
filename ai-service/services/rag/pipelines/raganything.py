@@ -45,7 +45,7 @@ class RAGAnythingPipeline:
         """
         self.logger = get_logger("RAGAnythingPipeline")
         self.kb_base_dir = kb_base_dir or str(
-            Path(__file__).resolve().parent.parent.parent.parent.parent / "data" / "knowledge_bases"
+            Path(__file__).resolve().parent.parent.parent.parent / "data" / "knowledge_bases"
         )
         self.enable_image = enable_image_processing
         self.enable_table = enable_table_processing
@@ -54,7 +54,7 @@ class RAGAnythingPipeline:
 
     def _setup_raganything_path(self):
         """Add RAG-Anything to sys.path if available."""
-        project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
+        project_root = Path(__file__).resolve().parent.parent.parent.parent
         raganything_path = project_root.parent / "raganything" / "RAG-Anything"
         if raganything_path.exists() and str(raganything_path) not in sys.path:
             sys.path.insert(0, str(raganything_path))

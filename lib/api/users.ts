@@ -23,12 +23,41 @@ export interface AutoShareResponse {
   autoShare: boolean;
 }
 
+export interface UpdateProfileRequest {
+  fullName: string;
+  bio: string;
+  avatarUrl: string;
+  location: string;
+  websiteUrl: string;
+  githubUrl: string;
+  linkedinUrl: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export async function getUserProfile(username: string): Promise<UserProfile> {
   return fetchApi<UserProfile>(`/users/profile/${encodeURIComponent(username)}`);
 }
 
 export async function getUserProfileById(id: string): Promise<UserProfile> {
   return fetchApi<UserProfile>(`/users/id/${id}`);
+}
+
+export async function updateProfile(payload: UpdateProfileRequest): Promise<UserProfile> {
+  return fetchApi<UserProfile>('/users/me', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function changePassword(payload: ChangePasswordRequest): Promise<void> {
+  await fetchApi<void>('/users/me/password', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 }
 
 /**

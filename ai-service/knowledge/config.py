@@ -6,8 +6,8 @@ Knowledge Base Path Configuration Module - Unified management of all paths
 import os
 from pathlib import Path
 
-# Project root directory (DeepTutor/)
-PROJECT_ROOT = Path(__file__).parent.parent.parent.resolve()
+# Project root directory (ai-service/)
+PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 # Knowledge base base directory
 KNOWLEDGE_BASES_DIR = PROJECT_ROOT / "data" / "knowledge_bases"

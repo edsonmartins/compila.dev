@@ -37,11 +37,7 @@ public class JavaScriptExecutor implements CodeExecutor {
             Files.writeString(tempFile, request.code());
 
             try {
-                // Build command
-                ProcessBuilder builder = new ProcessBuilder(
-                        "node",
-                        tempFile.toString()
-                );
+                ProcessBuilder builder = new ProcessBuilder(buildCommand(request, tempFile));
 
                 // Redirect error stream
                 builder.redirectErrorStream(true);
@@ -88,6 +84,36 @@ public class JavaScriptExecutor implements CodeExecutor {
             Thread.currentThread().interrupt();
             return ExecutionResult.error("Execution interrupted", ExecutionResult.ExecutionStatus.INTERNAL_ERROR);
         }
+    }
+
+    private List<String> buildCommand(ExecutionRequest request, Path tempFile) {
+        ExecutionRequest.ExecutionConstraints constraints = request.constraints();
+        Integer timeoutSeconds = constraints != null ? constraints.timeoutSeconds() : null;
+        Integer maxMemoryMb = constraints != null ? constraints.maxMemoryMb() : null;
+
+        boolean hasLimits = (timeoutSeconds != null && timeoutSeconds > 0)
+                || (maxMemoryMb != null && maxMemoryMb > 0);
+
+        if (!hasLimits) {
+            return List.of("node", tempFile.toString());
+        }
+
+        StringBuilder limits = new StringBuilder();
+        if (timeoutSeconds != null && timeoutSeconds > 0) {
+            limits.append("ulimit -t ").append(timeoutSeconds).append("; ");
+        }
+        if (maxMemoryMb != null && maxMemoryMb > 0) {
+            long maxKb = maxMemoryMb.longValue() * 1024L;
+            limits.append("ulimit -v ").append(maxKb).append("; ");
+        }
+
+        String filePath = shellQuote(tempFile.toString());
+        String command = limits + "exec node " + filePath;
+        return List.of("bash", "-lc", command);
+    }
+
+    private String shellQuote(String value) {
+        return "'" + value.replace("'", "'\"'\"'") + "'";
     }
 
     @Override

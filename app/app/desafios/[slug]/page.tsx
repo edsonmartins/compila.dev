@@ -58,11 +58,13 @@ export default function ChallengeDetailPage() {
 
   const [challenge, setChallenge] = useState<LocalChallenge | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'descricao' | 'codigo'>('codigo');
 
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
+        setErrorMessage(null);
         const data = await getChallengeBySlug(slug);
         const localChallenge: LocalChallenge = {
           id: data.id,
@@ -85,55 +87,8 @@ export default function ChallengeDetailPage() {
         setChallenge(localChallenge);
       } catch (error) {
         console.error('Failed to fetch challenge:', error);
-        // Fallback to mock data for development
-        const mockChallenge: LocalChallenge = {
-          id: '1',
-          slug: 'hello-world',
-          title: 'Hello World',
-          shortDescription: 'Seu primeiro desafio!',
-          description: `# Hello World
-
-Bem-vindo ao Compila.dev! Este é o seu primeiro desafio.
-
-## Objetivo
-
-Crie uma função que retorne a string "Hello World!".
-
-## Exemplo
-
-\`\`\`javascript
-function helloWorld() {
-  return "Hello World!";
-}
-\`\`\`
-
-## Requisitos
-
-- A função deve retornar exatamente "Hello World!"
-- Não use console.log, use return`,
-          stack: 'FRONTEND',
-          level: 'BEGINNER',
-          difficulty: 1,
-          technologies: ['javascript'],
-          xpReward: 10,
-          estimatedTimeMinutes: 5,
-          completedCount: 1234,
-          starterCode: {
-            javascript: `// Escreva seu código aqui
-function helloWorld() {
-  // Seu código aqui
-
-}
-
-// Teste sua função
-console.log(helloWorld());`,
-          },
-          requirements: {
-            functionName: 'helloWorld',
-            expectedOutput: 'Hello World!',
-          },
-        };
-        setChallenge(mockChallenge);
+        setChallenge(null);
+        setErrorMessage('Nao foi possivel carregar o desafio.');
       } finally {
         setLoading(false);
       }
@@ -214,7 +169,12 @@ console.log(helloWorld());`,
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Desafio não encontrado</h2>
+          <h2 className="text-xl font-semibold mb-2">Desafio nao encontrado</h2>
+          {errorMessage && (
+            <p className="text-sm text-neutral-600 dark:text-dark-muted mb-4">
+              {errorMessage}
+            </p>
+          )}
           <Button onClick={() => router.push('/app/desafios')}>Voltar</Button>
         </div>
       </div>

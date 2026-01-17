@@ -18,27 +18,14 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { getUserProfile, type UserProfile } from '@/lib/api/users';
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  coverImageUrl: string;
-  projectUrl: string;
-  repositoryUrl: string;
-  technologies: string[];
-  viewsCount: number;
-  likesCount: number;
-  featured: boolean;
-  createdAt: string;
-}
+import { getPublicPortfolio, type PortfolioProject } from '@/lib/api/portfolio';
 
 export default function UserProfilePage() {
   const params = useParams();
   const username = params.username as string;
 
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -50,9 +37,8 @@ export default function UserProfilePage() {
         const userData = await getUserProfile(username);
         setUser(userData);
 
-        // TODO: Fetch user projects from API
-        const mockProjects: Project[] = [];
-        setProjects(mockProjects);
+        const projectData = await getPublicPortfolio(username);
+        setProjects(projectData);
       } catch (error) {
         console.error('Failed to fetch user profile:', error);
         setNotFound(true);
@@ -264,12 +250,12 @@ export default function UserProfilePage() {
                   </div>
 
                   <p className="text-sm text-neutral-600 dark:text-dark-muted mb-4 line-clamp-2">
-                    {project.description}
+                    {project.description || project.shortDescription || 'Sem descricao.'}
                   </p>
 
                   {/* Technologies */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.map((tech) => (
+                    {(project.technologies || []).map((tech) => (
                       <span
                         key={tech}
                         className="px-2 py-1 bg-neutral-100 dark:bg-dark-border rounded text-xs"
@@ -292,16 +278,16 @@ export default function UserProfilePage() {
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      {project.projectUrl && (
+                      {project.projectUrl || project.demoUrl ? (
                         <a
-                          href={project.projectUrl}
+                          href={project.projectUrl || project.demoUrl || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm text-accent hover:underline"
                         >
                           Demo
                         </a>
-                      )}
+                      ) : null}
                       {project.repositoryUrl && (
                         <a
                           href={project.repositoryUrl}

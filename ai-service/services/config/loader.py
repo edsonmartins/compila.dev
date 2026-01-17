@@ -13,13 +13,12 @@ from typing import Any
 
 import yaml
 
-# PROJECT_ROOT points to the actual project root directory (DeepTutor/)
-# Path(__file__) = src/services/config/loader.py
-# .parent = src/services/config/
-# .parent.parent = src/services/
-# .parent.parent.parent = src/
-# .parent.parent.parent.parent = DeepTutor/ (project root)
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+# PROJECT_ROOT points to the ai-service root directory.
+# Path(__file__) = ai-service/services/config/loader.py
+# .parent = ai-service/services/config/
+# .parent.parent = ai-service/services/
+# .parent.parent.parent = ai-service/
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:

@@ -60,6 +60,8 @@ public class SecurityConfig {
                     "/oauth2/**",
                     "/challenges",
                     "/challenges/*",
+                    "/jobs",
+                    "/jobs/**",
                     "/portfolio/**",
                     "/error"
                 ).permitAll()

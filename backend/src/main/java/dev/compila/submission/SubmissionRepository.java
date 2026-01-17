@@ -29,4 +29,16 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
     java.util.List<Submission> findLatestByUserAndChallenge(@Param("userId") UUID userId, @Param("challengeId") UUID challengeId);
 
     long countByStatus(SubmissionStatus status);
+
+    long countByChallengeId(UUID challengeId);
+
+    long countByChallengeIdAndStatus(UUID challengeId, SubmissionStatus status);
+
+    long countByUserIdAndStatus(UUID userId, SubmissionStatus status);
+
+    @Query("SELECT COUNT(DISTINCT s.challengeId) FROM Submission s WHERE s.userId = :userId")
+    long countDistinctChallengesAttemptedByUserId(@Param("userId") UUID userId);
+
+    @Query("SELECT COUNT(DISTINCT s.challengeId) FROM Submission s WHERE s.userId = :userId AND s.status = :status")
+    long countDistinctChallengesByUserIdAndStatus(@Param("userId") UUID userId, @Param("status") SubmissionStatus status);
 }

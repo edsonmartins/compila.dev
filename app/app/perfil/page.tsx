@@ -24,7 +24,13 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { refreshUser } from '@/lib/api';
 import { StackTab } from '@/components/app/perfil/StackTab';
-import { getAutoShareSetting, updateAutoShareSetting } from '@/lib/api/users';
+import {
+  changePassword,
+  getAutoShareSetting,
+  getUserProfileById,
+  updateAutoShareSetting,
+  updateProfile,
+} from '@/lib/api/users';
 
 interface UserProfile {
   id: string;
@@ -63,27 +69,42 @@ export default function ProfilePage() {
   const [autoShareEnabled, setAutoShareEnabled] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      const userProfile: UserProfile = {
-        id: user.id,
-        username: user.username,
-        fullName: user.fullName,
-        bio: user.bio || '',
-        avatarUrl: user.avatarUrl || '',
-        location: '',
-        websiteUrl: '',
-        githubUrl: '',
-        linkedinUrl: '',
-        level: user.level,
-        xp: Number(user.xp),
-        streakCurrent: user.streakCurrent,
-        streakBest: user.streakBest || 0,
-        email: user.email,
-      };
-      setProfile(userProfile);
-      setEditedProfile(userProfile);
-      setLoading(false);
-    }
+    if (!user) return;
+
+    const buildProfile = (data: Partial<UserProfile>): UserProfile => ({
+      id: data.id || user.id,
+      username: data.username || user.username,
+      fullName: data.fullName || user.fullName,
+      bio: data.bio || '',
+      avatarUrl: data.avatarUrl || '',
+      location: data.location || '',
+      websiteUrl: data.websiteUrl || '',
+      githubUrl: data.githubUrl || '',
+      linkedinUrl: data.linkedinUrl || '',
+      level: data.level ?? user.level,
+      xp: data.xp ?? Number(user.xp),
+      streakCurrent: data.streakCurrent ?? user.streakCurrent,
+      streakBest: data.streakBest ?? user.streakBest || 0,
+      email: user.email,
+    });
+
+    const fetchProfile = async () => {
+      setLoading(true);
+      try {
+        const response = await getUserProfileById(user.id);
+        const userProfile = buildProfile(response);
+        setProfile(userProfile);
+        setEditedProfile(userProfile);
+      } catch (error) {
+        const fallbackProfile = buildProfile({});
+        setProfile(fallbackProfile);
+        setEditedProfile(fallbackProfile);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, [user]);
 
   useEffect(() => {
@@ -100,9 +121,33 @@ export default function ProfilePage() {
     setMessage(null);
 
     try {
-      // TODO: Call API to update profile
-      // await updateProfile(editedProfile);
-      setProfile(editedProfile);
+      const response = await updateProfile({
+        fullName: editedProfile.fullName,
+        bio: editedProfile.bio,
+        avatarUrl: editedProfile.avatarUrl,
+        location: editedProfile.location,
+        websiteUrl: editedProfile.websiteUrl,
+        githubUrl: editedProfile.githubUrl,
+        linkedinUrl: editedProfile.linkedinUrl,
+      });
+      const updatedProfile: UserProfile = {
+        ...editedProfile,
+        id: response.id,
+        username: response.username,
+        fullName: response.fullName || '',
+        bio: response.bio || '',
+        avatarUrl: response.avatarUrl || '',
+        location: response.location || '',
+        websiteUrl: response.websiteUrl || '',
+        githubUrl: response.githubUrl || '',
+        linkedinUrl: response.linkedinUrl || '',
+        level: response.level,
+        xp: response.xp,
+        streakCurrent: response.streakCurrent,
+        streakBest: response.streakBest,
+      };
+      setProfile(updatedProfile);
+      setEditedProfile(updatedProfile);
       setEditing(false);
       setMessage({ type: 'success', text: 'Perfil atualizado com sucesso!' });
 
@@ -137,8 +182,10 @@ export default function ProfilePage() {
 
     setSaving(true);
     try {
-      // TODO: Call API to change password
-      // await changePassword(passwordForm.current, passwordForm.new);
+      await changePassword({
+        currentPassword: passwordForm.current,
+        newPassword: passwordForm.new,
+      });
       setMessage({ type: 'success', text: 'Senha alterada com sucesso!' });
       setPasswordForm({ current: '', new: '', confirm: '' });
     } catch (error) {

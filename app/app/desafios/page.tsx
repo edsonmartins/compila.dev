@@ -22,12 +22,14 @@ export default function DesafiosPage() {
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [challenges, setChallenges] = useState<ChallengeWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
+        setErrorMessage(null);
         const response = await getChallenges({
           page,
           size: 20,
@@ -46,108 +48,9 @@ export default function DesafiosPage() {
         setTotalElements(response.totalElements);
       } catch (error) {
         console.error("Failed to fetch challenges:", error);
-        // Fallback to mock data for development
-        setChallenges([
-          {
-            id: "1",
-            title: "Dashboard Analytics",
-            slug: "dashboard-analytics",
-            shortDescription: "Crie um dashboard interativo com gráficos usando React e Recharts.",
-            description: "Desafio completo de dashboard com gráficos interativos, tabelas e filtros.",
-            stack: "frontend",
-            level: "junior",
-            difficulty: 3,
-            technologies: ["React", "TypeScript", "Recharts"],
-            xpReward: 120,
-            estimatedTimeMinutes: 120,
-            completedCount: 234,
-            featured: false,
-            userProgress: {
-              status: "in_progress" as const,
-              percentage: 45,
-            },
-          },
-          {
-            id: "2",
-            title: "API REST com Spring Boot",
-            slug: "api-rest-spring",
-            shortDescription: "Construa uma API RESTful completa usando Spring Boot e PostgreSQL.",
-            description: "Crie endpoints CRUD, validação, autenticação e testes automatizados.",
-            stack: "backend",
-            level: "junior",
-            difficulty: 3,
-            technologies: ["Java", "Spring Boot", "PostgreSQL"],
-            xpReward: 150,
-            estimatedTimeMinutes: 180,
-            completedCount: 156,
-            featured: false,
-          },
-          {
-            id: "3",
-            title: "Todo List com React Hooks",
-            slug: "todo-list-hooks",
-            shortDescription: "Implemente uma lista de tarefas completa usando useState e useEffect.",
-            description: "App de todo list com CRUD, filtros e persistência local.",
-            stack: "frontend",
-            level: "beginner",
-            difficulty: 1,
-            technologies: ["React", "TypeScript"],
-            xpReward: 50,
-            estimatedTimeMinutes: 45,
-            completedCount: 892,
-            featured: false,
-            userProgress: {
-              status: "completed" as const,
-              percentage: 100,
-            },
-          },
-          {
-            id: "4",
-            title: "Autenticação JWT",
-            slug: "auth-jwt",
-            shortDescription: "Implemente autenticação JWT com refresh tokens e OAuth.",
-            description: "Sistema de autenticação completo com login, registro e refresh tokens.",
-            stack: "backend",
-            level: "mid",
-            difficulty: 4,
-            technologies: ["Node.js", "Express", "JWT"],
-            xpReward: 180,
-            estimatedTimeMinutes: 150,
-            completedCount: 67,
-            featured: false,
-          },
-          {
-            id: "5",
-            title: "App Clima com Flutter",
-            slug: "weather-app-flutter",
-            shortDescription: "Crie um app de previsão do tempo usando a API OpenWeather.",
-            description: "App mobile com widgets, busca por cidade e forecast de 5 dias.",
-            stack: "mobile",
-            level: "junior",
-            difficulty: 2,
-            technologies: ["Flutter", "Dart", "HTTP"],
-            xpReward: 100,
-            estimatedTimeMinutes: 90,
-            completedCount: 123,
-            featured: false,
-          },
-          {
-            id: "6",
-            title: "Docker-compose para Microserviços",
-            slug: "docker-microservices",
-            shortDescription: "Orquestre múltiplos containers com Docker Compose.",
-            description: "Arquitetura de microserviços com Docker, networks e volumes.",
-            stack: "devops",
-            level: "mid",
-            difficulty: 4,
-            technologies: ["Docker", "nginx", "Redis"],
-            xpReward: 160,
-            estimatedTimeMinutes: 120,
-            completedCount: 45,
-            featured: false,
-          },
-        ]);
-        setTotalElements(6);
+        setChallenges([]);
+        setTotalElements(0);
+        setErrorMessage("Nao foi possivel carregar os desafios. Tente novamente.");
       } finally {
         setLoading(false);
       }
@@ -275,6 +178,11 @@ export default function DesafiosPage() {
         <p className="text-sm text-neutral-dark dark:text-dark-muted">
           Mostrando <span className="font-semibold text-primary dark:text-dark-foreground">{challenges.length}</span> de {totalElements} desafios
         </p>
+        {errorMessage && (
+          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/40 dark:text-red-200">
+            {errorMessage}
+          </div>
+        )}
       </div>
 
       {/* Grid */}

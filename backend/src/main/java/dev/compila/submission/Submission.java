@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ public class Submission extends BaseEntity {
 
     @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private Map<String, Object> testResults;
+    private List<Map<String, Object>> testResults;
 
     @Column
     private Integer score;
@@ -130,11 +131,11 @@ public class Submission extends BaseEntity {
         this.status = status;
     }
 
-    public Map<String, Object> getTestResults() {
+    public List<Map<String, Object>> getTestResults() {
         return testResults;
     }
 
-    public void setTestResults(Map<String, Object> testResults) {
+    public void setTestResults(List<Map<String, Object>> testResults) {
         this.testResults = testResults;
     }
 

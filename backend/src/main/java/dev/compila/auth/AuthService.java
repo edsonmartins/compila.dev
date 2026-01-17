@@ -78,8 +78,23 @@ public class AuthService implements UserDetailsService {
     }
 
     public Token refreshToken(String refreshToken) {
-        // TODO: Implement refresh token logic
-        return null;
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new RuntimeException("Refresh token is required");
+        }
+
+        if (!jwtService.isTokenValid(refreshToken)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        String username = jwtService.extractUsername(refreshToken);
+        UserDetails userDetails = loadUserByUsername(username);
+        var authentication = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+        return jwtService.generateToken(authentication);
     }
 
     public User getCurrentUser(String email) {

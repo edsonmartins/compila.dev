@@ -5,6 +5,7 @@ import dev.compila.submission.enums.ProgrammingLanguage;
 import dev.compila.submission.enums.SubmissionStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public record SubmissionResponse(
     ProgrammingLanguage language,
     Map<String, Object> files,
     SubmissionStatus status,
-    Map<String, Object> testResults,
+    List<Map<String, Object>> testResults,
     Integer score,
     Integer xpGained,
     Map<String, Object> aiFeedback,

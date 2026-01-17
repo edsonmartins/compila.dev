@@ -131,7 +131,7 @@ Examples:
         llm_config = get_llm_config()
     except ValueError as e:
         print(f"✗ Error: {e}")
-        print("Please configure in .env or DeepTutor.env file:")
+        print("Please configure in .env file:")
         print("  LLM_MODEL=gpt-4o")
         print("  LLM_API_KEY=your_api_key_here")
         print("  LLM_HOST=https://api.openai.com/v1")

@@ -15,161 +15,56 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { getJobs, type JobResponse } from '@/lib/api/jobs';
 
 type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'FREELANCE' | 'INTERNSHIP';
 type JobLevel = 'JUNIOR' | 'MID' | 'SENIOR' | 'LEAD' | 'ARCHITECT';
 
-interface Job {
-  id: string;
-  slug: string;
-  companyName: string;
-  companyLogoUrl?: string;
-  companyWebsite?: string;
-  title: string;
-  description: string;
-  requirements: string[];
-  benefits: string[];
+interface Job extends JobResponse {
   type: JobType;
-  level: JobLevel;
-  remote: boolean;
-  location?: string;
-  technologies: string[];
-  salaryMin?: number;
-  salaryMax?: number;
-  salaryCurrency: string;
-  applicationUrl?: string;
-  contactEmail?: string;
-  postedAt: string;
-  featured: boolean;
-  viewsCount: number;
 }
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<JobType | 'all'>('all');
   const [activeLevel, setActiveLevel] = useState<JobLevel | 'all'>('all');
   const [remoteOnly, setRemoteOnly] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
 
   useEffect(() => {
-    // TODO: Fetch jobs from API
-    const mockJobs: Job[] = [
-      {
-        id: '1',
-        slug: 'frontend-developer-react',
-        companyName: 'TechCorp Brasil',
-        companyLogoUrl: 'https://logo.clearbit.com/techcorp.com',
-        title: 'Desenvolvedor Frontend - React',
-        description: 'Estamos buscando um desenvolvedor Frontend experiente para trabalhar com React, TypeScript e Tailwind CSS em projetos desafiadores.',
-        requirements: [
-          '3+ anos de experiência com React',
-          'Experiência com TypeScript',
-          'Conhecimento em Tailwind CSS',
-          'Experiência com testes unitários',
-        ],
-        benefits: ['Saúde', 'Odonto', 'Home Office', 'Gympass'],
-        type: 'FULL_TIME',
-        level: 'MID',
-        remote: true,
-        location: 'São Paulo, SP (Híbrido)',
-        technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Jest'],
-        salaryMin: 8000,
-        salaryMax: 12000,
-        salaryCurrency: 'BRL',
-        applicationUrl: 'https://techcorp.com/apply',
-        postedAt: new Date(Date.now() - 2 * 24 * 3600000).toISOString(),
-        featured: true,
-        viewsCount: 1234,
-      },
-      {
-        id: '2',
-        slug: 'backend-developer-nodejs',
-        companyName: 'InovaTech',
-        companyLogoUrl: 'https://logo.clearbit.com/innovatech.com',
-        title: 'Desenvolvedor Backend - Node.js',
-        description: 'Procuramos um desenvolvedor Backend para construir APIs escaláveis e microserviços.',
-        requirements: [
-          '3+ anos com Node.js',
-          'Experiência com PostgreSQL',
-          'Conhecimento em Docker',
-          'Noções de AWS',
-        ],
-        benefits: ['Saúde', 'VR', 'VT', 'Home Office'],
-        type: 'FULL_TIME',
-        level: 'SENIOR',
-        remote: true,
-        technologies: ['Node.js', 'PostgreSQL', 'Docker', 'AWS'],
-        salaryMin: 10000,
-        salaryMax: 15000,
-        salaryCurrency: 'BRL',
-        contactEmail: 'vagas@innovatech.com',
-        postedAt: new Date(Date.now() - 5 * 24 * 3600000).toISOString(),
-        featured: true,
-        viewsCount: 892,
-      },
-      {
-        id: '3',
-        slug: 'fullstack-developer',
-        companyName: 'StartupX',
-        title: 'Desenvolvedor Full Stack',
-        description: 'Junte-se ao nosso time de desenvolvimento e trabalhe em produtos inovadores.',
-        requirements: [
-          'Conhecimento em React',
-          'Conhecimento em Node.js',
-          'Experiência com MongoDB',
-        ],
-        benefits: ['Equipe jovem', 'Ambiente descontraído', 'Home Office'],
-        type: 'FULL_TIME',
-        level: 'JUNIOR',
-        remote: false,
-        location: 'Rio de Janeiro, RJ',
-        technologies: ['React', 'Node.js', 'MongoDB'],
-        salaryMin: 4000,
-        salaryMax: 6000,
-        salaryCurrency: 'BRL',
-        applicationUrl: 'https://startupx.workable.com',
-        postedAt: new Date(Date.now() - 7 * 24 * 3600000).toISOString(),
-        featured: false,
-        viewsCount: 567,
-      },
-      {
-        id: '4',
-        slug: 'devops-engineer',
-        companyName: 'CloudSystems',
-        title: 'Engenheiro DevOps',
-        description: 'Procuramos um especialista em infraestrutura como código e CI/CD.',
-        requirements: [
-          'Experiência com Kubernetes',
-          'Conhecimento em Terraform',
-          'Experiência com CI/CD',
-        ],
-        benefits: ['Alta remuneração', 'Bônus', 'Home Office', 'Equipamentos'],
-        type: 'FULL_TIME',
-        level: 'SENIOR',
-        remote: true,
-        technologies: ['Kubernetes', 'Terraform', 'AWS', 'Docker'],
-        salaryMin: 15000,
-        salaryMax: 20000,
-        salaryCurrency: 'BRL',
-        contactEmail: 'careers@cloudsystems.com',
-        postedAt: new Date(Date.now() - 1 * 24 * 3600000).toISOString(),
-        featured: true,
-        viewsCount: 445,
-      },
-    ];
+    const fetchJobs = async () => {
+      setLoading(true);
+      setErrorMessage(null);
+      try {
+        const response = await getJobs({
+          page: 0,
+          size: 50,
+          type: activeType !== 'all' ? activeType : undefined,
+          level: activeLevel !== 'all' ? activeLevel : undefined,
+          remote: remoteOnly ? true : undefined,
+        });
 
-    setTimeout(() => {
-      setJobs(mockJobs);
-      setLoading(false);
-    }, 500);
-  }, []);
+        const mapped = response.content.map((job) => ({
+          ...job,
+          type: job.jobType as JobType,
+        }));
 
-  const filteredJobs = jobs.filter((job) => {
-    if (activeType !== 'all' && job.type !== activeType) return false;
-    if (activeLevel !== 'all' && job.level !== activeLevel) return false;
-    if (remoteOnly && !job.remote) return false;
-    return true;
-  });
+        setJobs(mapped);
+        setTotalElements(response.totalElements);
+      } catch (error) {
+        console.error('Failed to fetch jobs:', error);
+        setJobs([]);
+        setTotalElements(0);
+        setErrorMessage('Nao foi possivel carregar as vagas. Tente novamente.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [activeType, activeLevel, remoteOnly]);
 
   const getJobTypeLabel = (type: JobType) => {
     switch (type) {
@@ -309,12 +204,18 @@ export default function JobsPage() {
       ) : (
         <>
           <p className="text-sm text-neutral-dark dark:text-dark-muted mb-4">
-            {filteredJobs.length} vaga{filteredJobs.length !== 1 ? 's' : ''} encontrada
-            {filteredJobs.length !== 1 ? 's' : ''}
+            {jobs.length} vaga{jobs.length !== 1 ? 's' : ''} encontrada
+            {jobs.length !== 1 ? 's' : ''}
+            {totalElements > jobs.length ? ` de ${totalElements}` : ''}
           </p>
+          {errorMessage && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/40 dark:text-red-200">
+              {errorMessage}
+            </div>
+          )}
 
           <div className="space-y-4">
-            {filteredJobs.map((job) => (
+            {jobs.map((job) => (
               <Link
                 key={job.id}
                 href={`/app/vagas/${job.slug}`}

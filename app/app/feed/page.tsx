@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import FeedPostComponent from '@/components/app/social/FeedPost';
 import { CreatePostDialog } from '@/components/app/social/CreatePostDialog';
+import { CommentsDialog } from '@/components/app/social/CommentsDialog';
 import {
   getFeed,
   getTrending,
@@ -23,17 +24,24 @@ import {
   FeedPostResponse,
 } from '@/lib/api/social';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 type FeedTab = 'recent' | 'trending' | 'questions' | 'snippets';
 
 export default function FeedPage() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<FeedPostResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [selectedPostType, setSelectedPostType] = useState<PostType>(PostType.SHARE);
+  const [selectedPostIsSolved, setSelectedPostIsSolved] = useState(false);
   const [activeTab, setActiveTab] = useState<FeedTab>('recent');
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async (pageNum: number = 0) => {
     try {
@@ -93,13 +101,72 @@ export default function FeedPage() {
   };
 
   const handleComment = (postId: string) => {
-    // TODO: Open comment dialog/sheet
-    console.log('Open comments for post:', postId);
+    const post = posts.find((p) => p.id === postId);
+    if (post) {
+      setSelectedPostId(postId);
+      setSelectedPostType(post.type);
+      setSelectedPostIsSolved(post.isSolved);
+      setCommentsDialogOpen(true);
+    }
   };
 
   const handleShare = (postId: string) => {
-    // TODO: Implement share functionality (copy link, share to external, etc.)
-    console.log('Share post:', postId);
+    const post = posts.find((p) => p.id === postId);
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const shareUrl = `${baseUrl}/app/feed?post=${postId}`;
+    const title = post ? `Post de ${post.fullName}` : 'Post no Compila.dev';
+    const text = post?.content ? post.content.slice(0, 140) : 'Confira este post no Compila.dev';
+
+    const setMessage = (message: string) => {
+      setShareMessage(message);
+      window.setTimeout(() => setShareMessage(null), 3000);
+    };
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator
+        .share({ title, text, url: shareUrl })
+        .catch(() => {
+          setMessage('Nao foi possivel compartilhar o post.');
+        });
+      return;
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => setMessage('Link copiado para a area de transferencia.'))
+        .catch(() => setMessage('Nao foi possivel copiar o link.'));
+      return;
+    }
+
+    setMessage(`Link do post: ${shareUrl}`);
+  };
+
+  const handleCommentAdded = () => {
+    // Increment comment count for the post
+    if (selectedPostId) {
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === selectedPostId
+            ? { ...p, commentCount: p.commentCount + 1 }
+            : p
+        )
+      );
+    }
+  };
+
+  const handleSolutionMarked = () => {
+    // Mark the post as solved
+    if (selectedPostId) {
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === selectedPostId
+            ? { ...p, isSolved: true }
+            : p
+        )
+      );
+      setSelectedPostIsSolved(true);
+    }
   };
 
   const handleCreatePost = async (data: CreatePostRequest) => {
@@ -170,6 +237,11 @@ export default function FeedPage() {
       </header>
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
+        {shareMessage && (
+          <div className="mb-4 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 dark:border-dark-border dark:bg-dark-card dark:text-dark-foreground">
+            {shareMessage}
+          </div>
+        )}
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent" />
@@ -253,6 +325,19 @@ export default function FeedPage() {
         onClose={() => setCreateDialogOpen(false)}
         onPost={handleCreatePost}
       />
+
+      {selectedPostId && (
+        <CommentsDialog
+          open={commentsDialogOpen}
+          onClose={() => setCommentsDialogOpen(false)}
+          postId={selectedPostId}
+          postType={selectedPostType}
+          isSolved={selectedPostIsSolved}
+          isOwner={posts.some((post) => post.id === selectedPostId && post.userId === user?.id)}
+          onCommentAdded={handleCommentAdded}
+          onSolutionMarked={handleSolutionMarked}
+        />
+      )}
     </div>
   );
 }

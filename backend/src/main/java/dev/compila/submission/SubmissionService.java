@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.UUID;
 
 @Service
@@ -149,10 +150,12 @@ public class SubmissionService {
             int score = evaluation.score() != null ? evaluation.score() : 0;
             int xpGained = evaluation.passed() ? challenge.getXpReward() : 0;
 
-            // Serialize test results
-            String testResultsJson = objectMapper.writeValueAsString(evaluation.testResults());
+            List<Map<String, Object>> testResultsPayload = objectMapper.convertValue(
+                    evaluation.testResults(),
+                    TEST_RESULTS_TYPE
+            );
 
-            updateStatus(submissionId, status, score, xpGained, testResultsJson);
+            updateStatus(submissionId, status, score, xpGained, testResultsPayload);
 
         } catch (Exception e) {
             // Mark as failed on error
@@ -175,7 +178,7 @@ public class SubmissionService {
     }
 
     @Transactional
-    public SubmissionResponse updateStatus(UUID id, SubmissionStatus status, Integer score, Integer xpGained, String testResults) {
+    public SubmissionResponse updateStatus(UUID id, SubmissionStatus status, Integer score, Integer xpGained, List<Map<String, Object>> testResults) {
         Submission submission = submissionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Submission not found: " + id));
 
@@ -185,8 +188,7 @@ public class SubmissionService {
 
         // Parse test results if provided
         if (testResults != null) {
-            // TODO: Parse JSON test results
-            submission.setTestResults(null);
+            submission.setTestResults(testResults);
         }
 
         submission = submissionRepository.save(submission);
@@ -259,3 +261,5 @@ public class SubmissionService {
         };
     }
 }
+    private static final TypeReference<List<Map<String, Object>>> TEST_RESULTS_TYPE =
+            new TypeReference<>() {};

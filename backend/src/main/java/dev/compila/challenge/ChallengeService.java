@@ -5,6 +5,7 @@ import dev.compila.challenge.dto.ChallengeResponse;
 import dev.compila.challenge.dto.ChallengeSummaryResponse;
 import dev.compila.challenge.enums.ChallengeLevel;
 import dev.compila.challenge.enums.ChallengeStack;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ import java.util.UUID;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final ObjectMapper objectMapper;
 
-    public ChallengeService(ChallengeRepository challengeRepository) {
+    public ChallengeService(ChallengeRepository challengeRepository, ObjectMapper objectMapper) {
         this.challengeRepository = challengeRepository;
+        this.objectMapper = objectMapper;
     }
 
     public List<ChallengeSummaryResponse> findAllPublished() {
@@ -113,13 +116,24 @@ public class ChallengeService {
         challenge.setDifficulty(request.difficulty());
         challenge.setTechnologies(request.technologies() != null ? request.technologies().toArray(new String[0]) : null);
         challenge.setTags(request.tags() != null ? request.tags().toArray(new String[0]) : null);
-        challenge.setRequirements(request.requirements() != null ? request.requirements().toString() : null);
-        challenge.setStarterCode(request.starterCode() != null ? request.starterCode().toString() : null);
-        challenge.setSolutionCode(request.solutionCode() != null ? request.solutionCode().toString() : null);
+        challenge.setRequirements(writeJson(request.requirements()));
+        challenge.setStarterCode(writeJson(request.starterCode()));
+        challenge.setSolutionCode(writeJson(request.solutionCode()));
         challenge.setXpReward(request.xpReward());
         challenge.setEstimatedTimeMinutes(request.estimatedTimeMinutes());
         challenge.setBadges(request.badges() != null ? request.badges().toArray(new String[0]) : null);
         challenge.setPublished(request.published());
         challenge.setFeatured(request.featured());
+    }
+
+    private String writeJson(Object value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize challenge payload", e);
+        }
     }
 }

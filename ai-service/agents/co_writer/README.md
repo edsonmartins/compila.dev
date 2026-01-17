@@ -147,7 +147,7 @@ tts:
 
 ### Environment Variables
 
-Required for TTS (in `.env` or `DeepTutor.env`):
+Required for TTS (in `.env`):
 
 ```bash
 # DashScope TTS API (for NarratorAgent)

@@ -13,7 +13,7 @@ from src.logging import get_logger
 
 # Default knowledge base directory
 DEFAULT_KB_BASE_DIR = str(
-    Path(__file__).resolve().parent.parent.parent.parent / "data" / "knowledge_bases"
+    Path(__file__).resolve().parent.parent.parent / "data" / "knowledge_bases"
 )
 
 

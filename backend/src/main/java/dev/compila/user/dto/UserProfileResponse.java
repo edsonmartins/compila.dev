@@ -23,6 +23,10 @@ public record UserProfileResponse(
         Integer attemptedChallenges
 ) {
     public static UserProfileResponse from(User user) {
+        return from(user, 0, 0);
+    }
+
+    public static UserProfileResponse from(User user, long completedChallenges, long attemptedChallenges) {
         return new UserProfileResponse(
                 user.getId(),
                 user.getUsername(),
@@ -38,8 +42,8 @@ public record UserProfileResponse(
                 user.getStreakCurrent(),
                 user.getStreakBest(),
                 user.getCreatedAt(),
-                0, // TODO: Add completed challenges count
-                0  // TODO: Add attempted challenges count
+                (int) completedChallenges,
+                (int) attemptedChallenges
         );
     }
 }

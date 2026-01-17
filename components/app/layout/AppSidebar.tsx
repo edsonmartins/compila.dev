@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   Zap,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -40,6 +41,7 @@ const navItems: NavItem[] = [
 const bottomNavItems: NavItem[] = [
   { label: 'Perfil', href: '/app/perfil', icon: User },
   { label: 'Configurações', href: '/app/configuracoes', icon: Settings },
+  { label: 'Admin', href: '/app/admin', icon: Shield },
 ];
 
 interface AppSidebarProps {
