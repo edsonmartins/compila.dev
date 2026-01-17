@@ -27,6 +27,7 @@ import { StackTab } from '@/components/app/perfil/StackTab';
 import {
   changePassword,
   getAutoShareSetting,
+  type UserProfile as ApiUserProfile,
   getUserProfileById,
   updateAutoShareSetting,
   updateProfile,
@@ -71,20 +72,20 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return;
 
-    const buildProfile = (data: Partial<UserProfile>): UserProfile => ({
-      id: data.id || user.id,
-      username: data.username || user.username,
-      fullName: data.fullName || user.fullName,
-      bio: data.bio || '',
-      avatarUrl: data.avatarUrl || '',
-      location: data.location || '',
-      websiteUrl: data.websiteUrl || '',
-      githubUrl: data.githubUrl || '',
-      linkedinUrl: data.linkedinUrl || '',
+    const buildProfile = (data: Partial<ApiUserProfile>): UserProfile => ({
+      id: data.id ?? user.id,
+      username: data.username ?? user.username,
+      fullName: data.fullName ?? user.fullName,
+      bio: data.bio ?? '',
+      avatarUrl: data.avatarUrl ?? '',
+      location: data.location ?? '',
+      websiteUrl: data.websiteUrl ?? '',
+      githubUrl: data.githubUrl ?? '',
+      linkedinUrl: data.linkedinUrl ?? '',
       level: data.level ?? user.level,
       xp: data.xp ?? Number(user.xp),
       streakCurrent: data.streakCurrent ?? user.streakCurrent,
-      streakBest: data.streakBest ?? user.streakBest || 0,
+      streakBest: data.streakBest ?? (user.streakBest || 0),
       email: user.email,
     });
 

@@ -395,7 +395,7 @@ export default function AdminModerationPage() {
                             {getPostTypeLabel(item.metadata.postType)}
                           </span>
                         )}
-                      </span>
+                      </div>
                     </div>
 
                     <p className="text-sm text-neutral-700 dark:text-dark-foreground whitespace-pre-wrap">

@@ -367,7 +367,7 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Role Filter */}
-            <Select value={roleFilter} onValueChange={(v: RoleFilter) => setRoleFilter(v)}>
+            <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as RoleFilter)}>
               <SelectTrigger className="w-full lg:w-[160px] h-10">
                 <SelectValue placeholder="Função" />
               </SelectTrigger>
@@ -380,7 +380,7 @@ export default function AdminUsersPage() {
             </Select>
 
             {/* Status Filter */}
-            <Select value={statusFilter} onValueChange={(v: StatusFilter) => setStatusFilter(v)}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
               <SelectTrigger className="w-full lg:w-[140px] h-10">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>

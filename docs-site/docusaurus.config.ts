@@ -8,7 +8,6 @@ const config: Config = {
   url: 'https://compila.dev',
   baseUrl: '/docs/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'compila-dev',
   projectName: 'compila.dev',
@@ -34,6 +33,11 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   themeConfig: {
     navbar: {

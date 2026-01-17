@@ -20,8 +20,9 @@ import { getJobs, type JobResponse } from '@/lib/api/jobs';
 type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'FREELANCE' | 'INTERNSHIP';
 type JobLevel = 'JUNIOR' | 'MID' | 'SENIOR' | 'LEAD' | 'ARCHITECT';
 
-interface Job extends JobResponse {
+interface Job extends Omit<JobResponse, 'jobType' | 'level'> {
   type: JobType;
+  level: JobLevel;
 }
 
 export default function JobsPage() {
@@ -49,6 +50,7 @@ export default function JobsPage() {
         const mapped = response.content.map((job) => ({
           ...job,
           type: job.jobType as JobType,
+          level: job.level as JobLevel,
         }));
 
         setJobs(mapped);

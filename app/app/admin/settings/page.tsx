@@ -36,6 +36,7 @@ import { AdminLayout } from '@/components/app/admin/AdminLayout';
 
 export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
+  const [defaultLanguage, setDefaultLanguage] = useState('pt-BR');
 
   const handleSave = async () => {
     setSaving(true);
@@ -95,8 +96,8 @@ export default function AdminSettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="default-language">Idioma Padrão</Label>
-              <Select defaultValue="pt-BR">
-                <SelectTrigger id="default-language">
+              <Select value={defaultLanguage} onValueChange={setDefaultLanguage}>
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

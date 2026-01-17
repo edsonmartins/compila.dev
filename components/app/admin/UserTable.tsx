@@ -156,7 +156,11 @@ export function UserTable({
           <input
             type="checkbox"
             checked={allSelected}
-            ref={someSelected ? (input) => input && (input.indeterminate = true) : null}
+            ref={(input) => {
+              if (input) {
+                input.indeterminate = someSelected && !allSelected;
+              }
+            }}
             onChange={onToggleAll}
             className="w-4 h-4 rounded border-neutral-300 text-accent focus:ring-accent focus:ring-offset-0"
           />

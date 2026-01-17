@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
-  User,
+  User as UserIcon,
   Mail,
   Shield,
   ShieldAlert,
@@ -143,7 +143,7 @@ export function EditUserDialog({ open, onOpenChange, user, onSubmit }: EditUserD
                 Nome completo
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <Input
                   id="edit-fullName"
                   placeholder="ex: João Silva"

@@ -41,6 +41,8 @@ public class SubmissionService {
     private final ObjectMapper objectMapper;
     private final SocialTriggerService socialTriggerService;
     private final UserSkillService userSkillService;
+    private static final TypeReference<List<Map<String, Object>>> TEST_RESULTS_TYPE =
+            new TypeReference<>() {};
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
@@ -261,5 +263,3 @@ public class SubmissionService {
         };
     }
 }
-    private static final TypeReference<List<Map<String, Object>>> TEST_RESULTS_TYPE =
-            new TypeReference<>() {};

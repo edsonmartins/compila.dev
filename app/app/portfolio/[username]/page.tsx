@@ -230,7 +230,7 @@ export default function UserProfilePage() {
                 {/* Cover Image */}
                 <div className="h-48 bg-neutral-200 dark:bg-dark-border">
                   <img
-                    src={project.coverImageUrl}
+                    src={project.coverImageUrl || '/images/compila-dev.png'}
                     alt={project.title}
                     className="w-full h-full object-cover"
                   />
