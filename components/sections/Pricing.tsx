@@ -122,20 +122,21 @@ export function Pricing() {
               delay: prefersReducedMotion ? 0 : 0.2,
               ease: [0.25, 0.4, 0.25, 1],
             }}
+            className="relative pt-6"
           >
+            {/* Badge - fora do TerminalWindow para não ser cortado */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+              <div className="flex items-center gap-2 bg-terminal-cyan text-terminal-bg px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
+                <Crown className="h-4 w-4" />
+                {pricingPlans.pro.badge}
+              </div>
+            </div>
+
             <TerminalWindow
               title="compila-pro@1.0.0"
               className="border-terminal-cyan shadow-2xl shadow-terminal-cyan/10"
             >
-              {/* Badge */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                <div className="flex items-center gap-2 bg-terminal-cyan text-terminal-bg px-4 py-1 rounded-full text-sm font-semibold">
-                  <Crown className="h-4 w-4" />
-                  {pricingPlans.pro.badge}
-                </div>
-              </div>
-
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4">
                 {/* Package tree */}
                 <div className="font-mono text-sm space-y-1">
                   <div className="text-terminal-gray">├──</div>
