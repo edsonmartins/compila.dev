@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
-import { CheckCircle2, Code2, Terminal, Zap, Users, Trophy } from "lucide-react";
+import { CheckCircle2, Code2, Terminal, Zap } from "lucide-react";
 
 /**
  * Hero Section - Seção principal da landing page
@@ -90,13 +90,6 @@ export function HeroSection() {
     },
   };
 
-  // Code snippet para demonstração visual
-  const codeSnippet = `function saudacao(nome) {
-  return \`Olá, \${nome}! Bem-vindo ao Compila.dev\`;
-}
-
-console.log(saudacao("Mundo"));`;
-
   return (
     <section className="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
       <Container>
@@ -154,78 +147,44 @@ console.log(saudacao("Mundo"));`;
             </motion.div>
           </div>
 
-          {/* Hero Visual - Código demonstrativo */}
+          {/* Hero Visual - Demonstração visual */}
           <motion.div
             variants={imageVariants}
             initial="hidden"
             animate="visible"
             className="relative"
           >
-            <div className="rounded-xl bg-gradient-to-br from-primary to-accent/20 p-1 shadow-2xl">
+            <div className="rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 p-1 shadow-2xl">
               <div className="w-full rounded-lg bg-neutral-900 dark:bg-[#0A0F1D] p-6 font-mono text-sm overflow-hidden">
                 {/* Barra de janela */}
                 <div className="flex items-center gap-2 mb-4 text-neutral-400">
                   <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
                     <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
                   </div>
                   <div className="flex-1 text-right text-xs">
                     main.tsx
                   </div>
                 </div>
 
-                {/* Código de exemplo */}
+                {/* Código de exemplo com sintaxe realista */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4, duration: 0.5 }}
                   className="space-y-1"
                 >
-                  <div className="text-purple-400">import</div>
-                  <div className="flex">
-                    <span className="text-blue-400">{`{`}`}</span>
-                    <span className="text-orange-400">{`Challenge`}</span>
-                    <span className="text-neutral-400"> from </span>
-                    <span className="text-green-400">'compila-dev'</span>
-                    <span className="text-neutral-400">;</span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-purple-400">import</span>
-                    <span className="text-blue-400">{` {`}`}</span>
-                    <span className="text-yellow-400">CodeEditor</span>
-                    <span className="text-neutral-400"> from </span>
-                    <span className="text-cyan-400">'@compila/ui'</span>
-                    <span className="text-neutral-400">;</span>
-                  </div>
-                  <div className="text-neutral-300">
-                    {/* Linha em branco */}
-                    <span className="text-gray-500">export default function</span>
-                    <span className="text-blue-300"> ChallengePage</span>
-                    <span className="text-neutral-300">() {"{"}</span>
-                  </div>
-                  <div className="pl-4 text-neutral-300">
-                    {/* Conteúdo indentado */}
-                    <div className="text-gray-400">
-                      <span className="text-purple-400">const</span>
-                      <span className="text-cyan-400"> [</span>
-                      <span className="text-orange-400">challenge</span>
-                      <span className="text-cyan-400">]</span>
-                      <span className="text-neutral-300"> = </span>
-                      <span className="text-yellow-400">await</span>
-                      <span className="text-blue-400">getChallenge</span>
-                      <span className="text-cyan-400">(</span>
-                      <span className="text-green-400">'recursão'</span>
-                      <span className="text-cyan-400">)</span>
-                      <span className="text-neutral-300">;</span>
-                    </div>
-                    <div className="text-gray-400">
-                      <span className="text-purple-400">return</span>
-                      <span className="text-neutral-300"> (</span>
-                      <span className="text-green-400">true</span>
-                      <span className="text-neutral-300">) {"{"}</span>
-                    </div>
-                  </div>
+                  <CodeLine>import Challenge from "compila-dev"</CodeLine>
+                  <CodeLine>import CodeEditor from "@/compila/ui"</CodeLine>
+                  <CodeLine/>
+                  <CodeLine>const challenge = await getChallenge("recursão");</CodeLine>
+                  <CodeLine>const solution = await solve(challenge);</CodeLine>
+                  <CodeLine/>
+                  <CodeLine>const feedback = await analyzeCode(solution);</CodeLine>
+                  <CodeLine/>
+                  <CodeLine>const success = feedback.passed;</CodeLine>
+                  <CodeLine>console.log("Parabéns! + 50 XP");</CodeLine>
                 </motion.div>
 
                 {/* Status bar */}
@@ -236,14 +195,12 @@ console.log(saudacao("Mundo"));`;
                   className="mt-6 flex items-center justify-between text-xs text-neutral-400"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <span>Compilado</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3 text-green-500" />
-                      <span>3 testes</span>
-                    </span>
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span>Compilado</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                    <span>3 testes passaram</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Zap className="h-3 w-3 text-accent" />
@@ -284,11 +241,27 @@ console.log(saudacao("Mundo"));`;
   );
 }
 
+// Componente auxiliar para linha de código colorido
+function CodeLine({ children }: { children?: React.ReactNode }) {
+  const colors = {
+    keyword: "text-purple-400",
+    string: "text-orange-400",
+    number: "text-green-400",
+    comment: "text-gray-400",
+  };
+
+  return (
+    <div className="flex">
+      {children || <span>&nbsp;</span>}
+    </div>);
+}
+
+// Componente para badge de confiança
 function TrustBadge({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-neutral-dark dark:text-dark-muted">
-      <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0" />
-      <span>{text}</span>
+    <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card rounded-lg shadow-sm">
+      <CheckCircle2 className="h-4 w-4 text-green-500" />
+      <span className="text-sm font-medium text-neutral-700 dark:text-dark-foreground">{text}</span>
     </div>
   );
 }

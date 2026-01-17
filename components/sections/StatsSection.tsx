@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Code2, Trophy, Target, Zap } from "lucide-react";
+import { Users, Code2, Trophy, Target, Zap, Building2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
 /**
@@ -10,8 +10,8 @@ import { Container } from "@/components/ui/Container";
 export function StatsSection() {
   const stats = [
     { value: "500+", label: "Desafios", icon: Target },
-    { value: "10.000+", label: "Desenvolvedores", icon: Users },
-    { { value: "50+", label: "Badges", icon: Trophy },
+    { value: "10k+", label: "Desenvolvedores", icon: Users },
+    { value: "50+", label: "Badges", icon: Trophy },
     { value: "1M+", label: "Submissões", icon: Code2 },
     { value: "98%", label: "Satisfação", icon: Zap },
   ];
