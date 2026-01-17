@@ -200,7 +200,7 @@ export const footerLinks = {
     { label: "Blog", href: "/blog" },
     { label: "Docs", href: "/docs" },
     { label: "Status", href: "/status" },
-    { label: "GitHub", href: "/github" },
+    { label: "GitHub", href: "https://github.com/edsonmartins/compila.dev" },
   ],
   legal: [
     { label: "Termos de Uso", href: "/termos" },
@@ -210,6 +210,7 @@ export const footerLinks = {
 };
 
 export const socialLinks = [
+  { name: "GitHub", href: "https://github.com/edsonmartins/compila.dev", icon: "github" },
   { name: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
   { name: "Twitter", href: "https://twitter.com", icon: "twitter" },
   { name: "Discord", href: "https://discord.com", icon: "message-square" },

@@ -63,3 +63,4 @@ backend/mvnw.cmd
 backend/.settings/
 backend/.project
 backend/.classpath
+out
