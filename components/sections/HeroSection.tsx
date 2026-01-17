@@ -3,10 +3,10 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Code2, Terminal, Zap, Users, Trophy } from "lucide-react";
 
 /**
- * Hero Section - Seção principal acima da dobra
+ * Hero Section - Seção principal da landing page
  */
 export function HeroSection() {
   const prefersReducedMotion = useReducedMotion();
@@ -90,6 +90,13 @@ export function HeroSection() {
     },
   };
 
+  // Code snippet para demonstração visual
+  const codeSnippet = `function saudacao(nome) {
+  return \`Olá, \${nome}! Bem-vindo ao Compila.dev\`;
+}
+
+console.log(saudacao("Mundo"));`;
+
   return (
     <section className="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
       <Container>
@@ -122,7 +129,7 @@ export function HeroSection() {
               animate="visible"
               className="flex flex-col sm:flex-row gap-4 mb-8"
             >
-              <Button size="lg" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto shadow-lg shadow-accent/20">
                 Começar Grátis
               </Button>
               <Button
@@ -130,7 +137,7 @@ export function HeroSection() {
                 variant="secondary"
                 className="w-full sm:w-auto"
               >
-                Ver Desafios
+                Explorar Desafios
               </Button>
             </motion.div>
 
@@ -142,55 +149,111 @@ export function HeroSection() {
               className="flex flex-wrap gap-4 sm:gap-6"
             >
               <TrustBadge text="500+ desafios" />
+              <TrustBadge text="10k+ devs" />
               <TrustBadge text="Sem cartão" />
-              <TrustBadge text="Português" />
             </motion.div>
           </div>
 
-          {/* Hero Visual - Placeholder para imagem/vídeo */}
+          {/* Hero Visual - Código demonstrativo */}
           <motion.div
             variants={imageVariants}
             initial="hidden"
             animate="visible"
             className="relative"
           >
-            <div className="aspect-video rounded-xl bg-gradient-to-br from-primary to-accent/20 p-1">
-              <div className="w-full h-full rounded-lg bg-neutral-white/90 dark:bg-dark-card/90 backdrop-blur flex items-center justify-center">
-                {/* Placeholder visual - substituir por imagem real */}
-                <div className="text-center p-8">
-                  <svg
-                    width="120"
-                    height="120"
-                    viewBox="0 0 40 40"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="mx-auto mb-4 opacity-20"
-                  >
-                    <rect
-                      x="4"
-                      y="4"
-                      width="32"
-                      height="32"
-                      rx="4"
-                      fill="#0F2A44"
-                    />
-                    <path
-                      d="M13 12C13 12 13 28 13 28C13 28 27 28 27 28C27 28 27 12 27 12C27 12 13 12 13 12ZM16 16L24 16M16 20L24 20M16 24L20 24"
-                      stroke="#1ECAD3"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <p className="text-neutral-dark/60 dark:text-dark-muted/60 text-sm">
-                    Screenshot da plataforma
-                  </p>
-                  <p className="text-neutral-dark/40 dark:text-dark-muted/40 text-xs mt-1">
-                    (asset local será fornecido)
-                  </p>
+            <div className="rounded-xl bg-gradient-to-br from-primary to-accent/20 p-1 shadow-2xl">
+              <div className="w-full rounded-lg bg-neutral-900 dark:bg-[#0A0F1D] p-6 font-mono text-sm overflow-hidden">
+                {/* Barra de janela */}
+                <div className="flex items-center gap-2 mb-4 text-neutral-400">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="flex-1 text-right text-xs">
+                    main.tsx
+                  </div>
                 </div>
+
+                {/* Código de exemplo */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                  className="space-y-1"
+                >
+                  <div className="text-purple-400">import</div>
+                  <div className="flex">
+                    <span className="text-blue-400">{`{`}`}</span>
+                    <span className="text-orange-400">{`Challenge`}</span>
+                    <span className="text-neutral-400"> from </span>
+                    <span className="text-green-400">'compila-dev'</span>
+                    <span className="text-neutral-400">;</span>
+                  </div>
+                  <div className="flex">
+                    <span className="text-purple-400">import</span>
+                    <span className="text-blue-400">{` {`}`}</span>
+                    <span className="text-yellow-400">CodeEditor</span>
+                    <span className="text-neutral-400"> from </span>
+                    <span className="text-cyan-400">'@compila/ui'</span>
+                    <span className="text-neutral-400">;</span>
+                  </div>
+                  <div className="text-neutral-300">
+                    {/* Linha em branco */}
+                    <span className="text-gray-500">export default function</span>
+                    <span className="text-blue-300"> ChallengePage</span>
+                    <span className="text-neutral-300">() {"{"}</span>
+                  </div>
+                  <div className="pl-4 text-neutral-300">
+                    {/* Conteúdo indentado */}
+                    <div className="text-gray-400">
+                      <span className="text-purple-400">const</span>
+                      <span className="text-cyan-400"> [</span>
+                      <span className="text-orange-400">challenge</span>
+                      <span className="text-cyan-400">]</span>
+                      <span className="text-neutral-300"> = </span>
+                      <span className="text-yellow-400">await</span>
+                      <span className="text-blue-400">getChallenge</span>
+                      <span className="text-cyan-400">(</span>
+                      <span className="text-green-400">'recursão'</span>
+                      <span className="text-cyan-400">)</span>
+                      <span className="text-neutral-300">;</span>
+                    </div>
+                    <div className="text-gray-400">
+                      <span className="text-purple-400">return</span>
+                      <span className="text-neutral-300"> (</span>
+                      <span className="text-green-400">true</span>
+                      <span className="text-neutral-300">) {"{"}</span>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Status bar */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.4 }}
+                  className="mt-6 flex items-center justify-between text-xs text-neutral-400"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span>Compilado</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3 text-green-500" />
+                      <span>3 testes</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-3 w-3 text-accent" />
+                    <span>+50 XP</span>
+                  </div>
+                </motion.div>
               </div>
             </div>
-            {/* Elemento decorativo */}
+
+            {/* Elementos decorativos animados */}
             <motion.div
               animate={{
                 scale: prefersReducedMotion ? 1 : [1, 1.1, 1],
@@ -200,7 +263,7 @@ export function HeroSection() {
                 repeat: prefersReducedMotion ? 0 : Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute -z-10 -top-4 -right-4 w-72 h-72 bg-accent/10 rounded-full blur-3xl"
+              className="absolute -z-10 -top-4 -right-4 w-72 h-72 bg-accent/20 rounded-full blur-3xl"
             />
             <motion.div
               animate={{
@@ -212,7 +275,7 @@ export function HeroSection() {
                 ease: "easeInOut",
                 delay: 0.5,
               }}
-              className="absolute -z-10 -bottom-4 -left-4 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
+              className="absolute -z-10 -bottom-4 -left-4 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
             />
           </motion.div>
         </div>
