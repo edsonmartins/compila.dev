@@ -25,66 +25,6 @@ Usage:
     stats.print_summary()
 """
 
-# CRITICAL: Ensure stdlib logging is imported BEFORE any local logging imports
-# This prevents the local 'logging' package from shadowing the stdlib module
-import sys
-import importlib.util
-import os
-
-# Find and load the stdlib logging module AND its submodules directly from file location
-# This bypasses Python's module finder which would find our local package
-def load_stdlib_logging():
-    """Load stdlib logging and its submodules, bypassing the local package."""
-    stdlib_base = os.path.join(sys.prefix, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'logging')
-
-    # Load main logging module
-    stdlib_path = os.path.join(stdlib_base, '__init__.py')
-    if not os.path.exists(stdlib_path):
-        # Try alternate locations
-        for base in sys.path:
-            candidate = os.path.join(base, 'logging', '__init__.py')
-            if os.path.exists(candidate) and 'ai-service' not in candidate:
-                stdlib_path = candidate
-                stdlib_base = os.path.dirname(candidate)
-                break
-
-    if not os.path.exists(stdlib_path):
-        return None
-
-    # Load main logging module
-    spec = importlib.util.spec_from_file_location('_stdlib_logging', stdlib_path)
-    _stdlib_logging = importlib.util.module_from_spec(spec)
-    sys.modules['_stdlib_logging'] = _stdlib_logging
-    # Temporarily set 'logging' to stdlib for the exec_module call
-    sys.modules['logging'] = _stdlib_logging
-    spec.loader.exec_module(_stdlib_logging)
-
-    # Load critical submodules that handlers.py needs
-    handlers_path = os.path.join(stdlib_base, 'handlers.py')
-    if os.path.exists(handlers_path):
-        spec2 = importlib.util.spec_from_file_location('logging.handlers', handlers_path)
-        _handlers = importlib.util.module_from_spec(spec2)
-        sys.modules['logging.handlers'] = _handlers
-        # Ensure 'logging' in sys.modules points to stdlib during this load
-        spec2.loader.exec_module(_handlers)
-
-    # CRITICAL: Remove 'logging' from sys.modules so that subsequent imports
-    # will use the local package (this file)
-    if 'logging' in sys.modules and sys.modules['logging'] is _stdlib_logging:
-        del sys.modules['logging']
-
-    return _stdlib_logging
-
-# Load stdlib logging BEFORE importing anything else
-_stdlib_logging = load_stdlib_logging()
-
-if _stdlib_logging:
-    # Store stdlib logging reference for adapters to use
-    sys.modules['_stdlib_logging'] = _stdlib_logging
-else:
-    # Fallback if loading failed
-    raise ImportError("Could not load stdlib logging module")
-
 # Core logging
 # Adapters for external libraries
 from .adapters import (

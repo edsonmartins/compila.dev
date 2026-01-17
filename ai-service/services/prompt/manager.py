@@ -80,7 +80,7 @@ class PromptManager:
         subdirectory: str | None,
     ) -> dict[str, Any]:
         """Load prompt file with language fallback."""
-        prompts_dir = PROJECT_ROOT / "agents" / module_name / "prompts"
+        prompts_dir = PROJECT_ROOT / "src" / "agents" / module_name / "prompts"
         fallback_chain = self.LANGUAGE_FALLBACKS.get(lang_code, ["en"])
 
         for lang in fallback_chain:

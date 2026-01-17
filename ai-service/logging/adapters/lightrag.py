@@ -7,17 +7,9 @@ Forwards LightRAG and RAG-Anything logs to DeepTutor's unified logging system.
 """
 
 from contextlib import contextmanager
+import logging
 from pathlib import Path
 from typing import Optional
-
-# Use the stdlib logging that was pre-loaded in __init__.py
-# Access via sys.modules to ensure we get stdlib, not local package
-import sys
-logging = sys.modules.get('_stdlib_logging')
-if logging is None:
-    # Fallback if _stdlib_logging not available
-    import importlib
-    logging = importlib.import_module('logging')
 
 
 class LightRAGLogForwarder(logging.Handler):

@@ -8,17 +8,19 @@ Unified configuration loading for all DeepTutor modules.
 Provides YAML configuration loading, path resolution, and language parsing.
 """
 
+import asyncio
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-# PROJECT_ROOT points to the ai-service root directory.
-# Path(__file__) = ai-service/services/config/loader.py
-# .parent = ai-service/services/config/
-# .parent.parent = ai-service/services/
-# .parent.parent.parent = ai-service/
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+# PROJECT_ROOT points to the actual project root directory (DeepTutor/)
+# Path(__file__) = src/services/config/loader.py
+# .parent = src/services/config/
+# .parent.parent = src/services/
+# .parent.parent.parent = src/
+# .parent.parent.parent.parent = DeepTutor/ (project root)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
 
 def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
@@ -45,6 +47,17 @@ def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any
     return result
 
 
+def _load_yaml_file(file_path: Path) -> dict[str, Any]:
+    """Load a YAML file and return its contents as a dict."""
+    with open(file_path, encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+async def _load_yaml_file_async(file_path: Path) -> dict[str, Any]:
+    """Async version of _load_yaml_file."""
+    return await asyncio.to_thread(_load_yaml_file, file_path)
+
+
 def load_config_with_main(config_file: str, project_root: Path | None = None) -> dict[str, Any]:
     """
     Load configuration file, automatically merge with main.yaml common configuration
@@ -66,8 +79,7 @@ def load_config_with_main(config_file: str, project_root: Path | None = None) ->
     main_config_path = config_dir / "main.yaml"
     if main_config_path.exists():
         try:
-            with open(main_config_path, encoding="utf-8") as f:
-                main_config = yaml.safe_load(f) or {}
+            main_config = _load_yaml_file(main_config_path)
         except Exception as e:
             print(f"⚠️ Failed to load main.yaml: {e}")
 
@@ -76,8 +88,51 @@ def load_config_with_main(config_file: str, project_root: Path | None = None) ->
     module_config_path = config_dir / config_file
     if module_config_path.exists():
         try:
-            with open(module_config_path, encoding="utf-8") as f:
-                module_config = yaml.safe_load(f) or {}
+            module_config = _load_yaml_file(module_config_path)
+        except Exception as e:
+            print(f"⚠️ Failed to load {config_file}: {e}")
+
+    # 3. Merge configurations: main.yaml as base, sub-module config overrides
+    merged_config = _deep_merge(main_config, module_config)
+
+    return merged_config
+
+
+async def load_config_with_main_async(
+    config_file: str, project_root: Path | None = None
+) -> dict[str, Any]:
+    """
+    Async version of load_config_with_main for non-blocking file operations.
+
+    Load configuration file, automatically merge with main.yaml common configuration
+
+    Args:
+        config_file: Sub-module configuration file name (e.g., "solve_config.yaml")
+        project_root: Project root directory (if None, will try to auto-detect)
+
+    Returns:
+        Merged configuration dictionary
+    """
+    if project_root is None:
+        project_root = PROJECT_ROOT
+
+    config_dir = project_root / "config"
+
+    # 1. Load main.yaml (common configuration)
+    main_config = {}
+    main_config_path = config_dir / "main.yaml"
+    if main_config_path.exists():
+        try:
+            main_config = await _load_yaml_file_async(main_config_path)
+        except Exception as e:
+            print(f"⚠️ Failed to load main.yaml: {e}")
+
+    # 2. Load sub-module configuration file
+    module_config = {}
+    module_config_path = config_dir / config_file
+    if module_config_path.exists():
+        try:
+            module_config = await _load_yaml_file_async(module_config_path)
         except Exception as e:
             print(f"⚠️ Failed to load {config_file}: {e}")
 

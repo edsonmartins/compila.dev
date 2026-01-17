@@ -8,24 +8,8 @@ File-based logging with rotation support.
 import asyncio
 from datetime import datetime
 import json
-import sys
-import os
-
-# Use stdlib logging from __init__.py
-logging = sys.modules.get('_stdlib_logging')
-if logging is None:
-    import logging as _fallback_logging
-    logging = _fallback_logging
-
-# Import RotatingFileHandler from pre-loaded logging.handlers
-_stdlib_logging_handlers = sys.modules.get('logging.handlers')
-if _stdlib_logging_handlers:
-    BaseRotatingFileHandler = _stdlib_logging_handlers.RotatingFileHandler
-else:
-    # Define a fallback
-    class BaseRotatingFileHandler(logging.Handler):
-        pass
-
+import logging
+from logging.handlers import RotatingFileHandler as BaseRotatingFileHandler
 from pathlib import Path
 from typing import Optional
 
