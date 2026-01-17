@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import {
   KudoType,
   KUDO_CONFIG,
@@ -79,6 +80,9 @@ export function KudoButton({
         onKudoChange?.(response);
       } catch (error) {
         console.error('Failed to remove kudo:', error);
+        toast.error('Não foi possível remover o kudo');
+        // Revert state on error
+        setPendingKudo(userKudo ?? null);
       }
       return;
     }
@@ -94,6 +98,9 @@ export function KudoButton({
       onKudoChange?.(response);
     } catch (error) {
       console.error('Failed to give kudo:', error);
+      toast.error('Não foi possível dar o kudo');
+      // Revert state on error
+      setPendingKudo(userKudo ?? null);
     }
   };
 

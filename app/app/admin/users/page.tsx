@@ -36,6 +36,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('ALL');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
@@ -56,93 +57,14 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     try {
+      setError(null);
       if (!refreshing) setLoading(true);
       const response = await fetchApi<{ content: User[] }>('/admin/users');
       setUsers(response.content || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      // Mock data for development
-      setUsers([
-        {
-          id: '1',
-          username: 'joaosilva',
-          fullName: 'João Silva',
-          email: 'joao@compila.dev',
-          role: 'USER',
-          enabled: true,
-          emailVerified: true,
-          level: 12,
-          xp: 12450,
-          streakCurrent: 7,
-          subscription: 'PRO',
-          createdAt: '2024-01-15T10:30:00',
-          lastLoginAt: '2025-01-10T09:15:00',
-          challengesCompleted: 15,
-        },
-        {
-          id: '2',
-          username: 'mariasantos',
-          fullName: 'Maria Santos',
-          email: 'maria@compila.dev',
-          role: 'USER',
-          enabled: true,
-          emailVerified: true,
-          level: 8,
-          xp: 8200,
-          streakCurrent: 3,
-          subscription: 'FREE',
-          createdAt: '2024-02-20T14:00:00',
-          lastLoginAt: '2025-01-09T16:45:00',
-          challengesCompleted: 8,
-        },
-        {
-          id: '3',
-          username: 'pedrocosta',
-          fullName: 'Pedro Costa',
-          email: 'pedro@compila.dev',
-          role: 'MODERATOR',
-          enabled: false,
-          emailVerified: false,
-          level: 3,
-          xp: 2100,
-          streakCurrent: 0,
-          subscription: 'FREE',
-          createdAt: '2024-06-10T08:30:00',
-          challengesCompleted: 2,
-        },
-        {
-          id: '4',
-          username: 'admin',
-          fullName: 'Administrador',
-          email: 'admin@compila.dev',
-          role: 'ADMIN',
-          enabled: true,
-          emailVerified: true,
-          level: 50,
-          xp: 50000,
-          streakCurrent: 100,
-          subscription: 'PRO_PLUS',
-          createdAt: '2023-12-01T00:00:00',
-          lastLoginAt: '2025-01-11T10:00:00',
-          challengesCompleted: 50,
-        },
-        {
-          id: '5',
-          username: 'anabeatriz',
-          fullName: 'Ana Beatriz',
-          email: 'ana@compila.dev',
-          role: 'USER',
-          enabled: true,
-          emailVerified: true,
-          level: 15,
-          xp: 15600,
-          streakCurrent: 12,
-          subscription: 'PRO',
-          createdAt: '2024-01-05T11:00:00',
-          lastLoginAt: '2025-01-11T08:30:00',
-          challengesCompleted: 22,
-        },
-      ]);
+      setError('Não foi possível carregar usuários. Tente novamente.');
+      setUsers([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -287,6 +209,34 @@ export default function AdminUsersPage() {
 
           {/* Table skeleton */}
           <div className="h-96 bg-neutral-200 dark:bg-neutral-700 rounded-xl animate-pulse" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  // Error state
+  if (error && users.length === 0) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center py-20 px-4">
+          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+            Erro ao carregar usuários
+          </h2>
+          <p className="text-neutral-500 dark:text-neutral-400 mb-6 text-center max-w-md">
+            {error}
+          </p>
+          <Button
+            onClick={() => fetchUsers()}
+            className="gap-2 bg-accent hover:bg-accent/90"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Tentar novamente
+          </Button>
         </div>
       </AdminLayout>
     );

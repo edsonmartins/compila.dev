@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserPlus, Mail, User, Shield, KeyRound, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface CreateUserFormData {
   username: string;
@@ -61,8 +62,23 @@ export function AddUserDialog({ open, onOpenChange, onSubmit }: AddUserDialogPro
 
     if (!formData.password) {
       newErrors.password = 'Senha é obrigatória';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Mínimo de 6 caracteres';
+    } else {
+      const passwordErrors: string[] = [];
+      if (formData.password.length < 8) {
+        passwordErrors.push('Mínimo de 8 caracteres');
+      }
+      if (!/[A-Z]/.test(formData.password)) {
+        passwordErrors.push('Uma letra maiúscula');
+      }
+      if (!/[a-z]/.test(formData.password)) {
+        passwordErrors.push('Uma letra minúscula');
+      }
+      if (!/[0-9]/.test(formData.password)) {
+        passwordErrors.push('Um número');
+      }
+      if (passwordErrors.length > 0) {
+        newErrors.password = passwordErrors.join(', ');
+      }
     }
 
     setErrors(newErrors);
@@ -77,9 +93,12 @@ export function AddUserDialog({ open, onOpenChange, onSubmit }: AddUserDialogPro
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
+      toast.success('Usuário criado com sucesso!');
       handleClose();
     } catch (error) {
       console.error('Failed to create user:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Não foi possível criar o usuário';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -233,7 +252,7 @@ export function AddUserDialog({ open, onOpenChange, onSubmit }: AddUserDialogPro
                 <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.password}</p>
               )}
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                O usuário deverá alterar a senha no primeiro acesso
+                Requisitos: 8+ caracteres, maiúscula, minúscula e número. O usuário deverá alterar no primeiro acesso.
               </p>
             </div>
 

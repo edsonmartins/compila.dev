@@ -16,7 +16,9 @@ import os
 from pathlib import Path
 import sys
 import time
-from typing import Any, AsyncGenerator
+from typing import Any
+
+from agents.protocols import TokenTracker
 
 # Add project root to path
 _project_root = Path(__file__).parent.parent.parent
@@ -61,7 +63,7 @@ class BaseAgent(ABC):
         language: str = "zh",
         binding: str = "openai",
         config: dict[str, Any] | None = None,
-        token_tracker: Any | None = None,
+        token_tracker: TokenTracker | None = None,
         log_dir: str | None = None,
     ):
         """

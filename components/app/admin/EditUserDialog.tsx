@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { User } from './UserTable';
+import { toast } from 'sonner';
 
 interface EditUserDialogProps {
   open: boolean;
@@ -84,9 +85,12 @@ export function EditUserDialog({ open, onOpenChange, user, onSubmit }: EditUserD
     setIsSubmitting(true);
     try {
       await onSubmit(user.id, formData);
+      toast.success('Usuário atualizado com sucesso!');
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to update user:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Não foi possível atualizar o usuário';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

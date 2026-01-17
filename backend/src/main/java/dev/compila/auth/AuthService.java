@@ -1,5 +1,8 @@
 package dev.compila.auth;
 
+import dev.compila.auth.exception.InvalidTokenException;
+import dev.compila.auth.exception.ResourceNotFoundException;
+import dev.compila.auth.exception.UserAlreadyExistsException;
 import dev.compila.auth.security.JwtService;
 import dev.compila.auth.security.userdetails.UserDetailsImpl;
 import dev.compila.user.User;
@@ -41,10 +44,10 @@ public class AuthService implements UserDetailsService {
     public Token register(RegisterRequest request) {
         // Check if user already exists
         if (userRepository.existsByUsername(request.username())) {
-            throw new RuntimeException("Username already exists");
+            throw new UserAlreadyExistsException("username", request.username());
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists");
+            throw new UserAlreadyExistsException("email", request.email());
         }
 
         // Create new user
@@ -79,11 +82,11 @@ public class AuthService implements UserDetailsService {
 
     public Token refreshToken(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
-            throw new RuntimeException("Refresh token is required");
+            throw new InvalidTokenException("Refresh token is required");
         }
 
         if (!jwtService.isTokenValid(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token");
+            throw new InvalidTokenException("Invalid or expired refresh token");
         }
 
         String username = jwtService.extractUsername(refreshToken);
@@ -99,6 +102,6 @@ public class AuthService implements UserDetailsService {
 
     public User getCurrentUser(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email=" + email));
     }
 }

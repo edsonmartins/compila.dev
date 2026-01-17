@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = "*")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
@@ -226,12 +225,20 @@ public class AdminController {
     // ==================== Moderation ====================
 
     @GetMapping("/moderation/posts")
-    public ResponseEntity<List<AdminModerationItemDTO>> getReportedPosts(
-            @RequestParam(defaultValue = "PENDING") String status
+    public ResponseEntity<Page<AdminModerationItemDTO>> getReportedPosts(
+            @RequestParam(defaultValue = "PENDING") String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
     ) {
-        return ResponseEntity.ok(postRepository.findAll().stream()
-                .map(this::mapToModerationItemDTO)
-                .collect(Collectors.toList()));
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Filter posts based on status - for now return all posts with pagination
+        // TODO: Add proper status filtering when Post entity has report status
+        return ResponseEntity.ok(postRepository.findAll(pageable)
+                .map(this::mapToModerationItemDTO));
     }
 
     @DeleteMapping("/moderation/posts/{id}")

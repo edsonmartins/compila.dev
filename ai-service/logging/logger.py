@@ -448,7 +448,8 @@ class Logger:
                     else str(tool_input)
                 )
                 self.debug(f"Tool Input: {input_str[:500]}...")
-            except:
+            except (TypeError, ValueError):
+                # Data not JSON serializable, skip formatting
                 pass
         if tool_output is not None:
             try:
@@ -458,7 +459,8 @@ class Logger:
                     else str(tool_output)
                 )
                 self.debug(f"Tool Output: {output_str[:500]}...")
-            except:
+            except (TypeError, ValueError):
+                # Data not JSON serializable, skip formatting
                 pass
 
     def log_llm_input(
@@ -656,9 +658,10 @@ def get_logger(
                     log_dir = str(PROJECT_ROOT / log_dir_str)
                 else:
                     log_dir = str(log_dir_path)
-        except Exception:
-            # Fallback to default
-            pass
+        except (OSError, ValueError) as e:
+            # Fallback to default, log the error for debugging
+            import sys
+            print(f"Warning: Failed to resolve log directory: {e}", file=sys.stderr)
     log_dir_key = str(log_dir) if log_dir is not None else None
     # Create a cache key that includes configuration, using a normalized log_dir
     cache_key = (name, level, console_output, file_output, log_dir_key)

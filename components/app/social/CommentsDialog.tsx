@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import {
   CommentResponse,
   getComments,
@@ -69,6 +70,7 @@ export function CommentsDialog({
       setComments(response.content || []);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
+      toast.error('Não foi possível carregar os comentários');
       setComments([]);
     } finally {
       setLoading(false);
@@ -92,9 +94,11 @@ export function CommentsDialog({
       const comment = await addComment(postId, request);
       setComments((prev) => [comment, ...prev]);
       setNewComment('');
+      toast.success('Comentário adicionado!');
       onCommentAdded?.();
     } catch (error) {
       console.error('Failed to add comment:', error);
+      toast.error('Não foi possível adicionar o comentário');
     } finally {
       setSubmitting(false);
     }
@@ -132,9 +136,11 @@ export function CommentsDialog({
 
       setReplyText('');
       setReplyTo(null);
+      toast.success('Resposta adicionada!');
       onCommentAdded?.();
     } catch (error) {
       console.error('Failed to add reply:', error);
+      toast.error('Não foi possível adicionar a resposta');
     } finally {
       setSubmitting(false);
     }
@@ -149,9 +155,11 @@ export function CommentsDialog({
           isSolution: c.id === commentId ? true : c.isSolution,
         }))
       );
+      toast.success('Comentário marcado como solução!');
       onSolutionMarked?.();
     } catch (error) {
       console.error('Failed to mark as solution:', error);
+      toast.error('Não foi possível marcar como solução');
     }
   };
 
@@ -191,6 +199,7 @@ export function CommentsDialog({
           });
         } catch (error) {
           console.error('Failed to fetch replies:', error);
+          toast.error('Não foi possível carregar as respostas');
         }
       }
     }

@@ -1,5 +1,6 @@
 package dev.compila.challenge;
 
+import dev.compila.auth.exception.ResourceNotFoundException;
 import dev.compila.challenge.dto.ChallengeRequest;
 import dev.compila.challenge.dto.ChallengeResponse;
 import dev.compila.challenge.dto.ChallengeSummaryResponse;
@@ -58,13 +59,13 @@ public class ChallengeService {
 
     public ChallengeResponse findBySlug(String slug) {
         Challenge challenge = challengeRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Challenge not found: " + slug));
+                .orElseThrow(() -> new ResourceNotFoundException("Challenge", "slug=" + slug));
         return ChallengeResponse.from(challenge);
     }
 
     public ChallengeResponse findById(UUID id) {
         Challenge challenge = challengeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Challenge not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Challenge", "id=" + id));
         return ChallengeResponse.from(challenge);
     }
 
@@ -79,7 +80,7 @@ public class ChallengeService {
     @Transactional
     public ChallengeResponse update(UUID id, ChallengeRequest request) {
         Challenge challenge = challengeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Challenge not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Challenge", "id=" + id));
         updateChallengeFromRequest(challenge, request);
         challenge = challengeRepository.save(challenge);
         return ChallengeResponse.from(challenge);
@@ -92,18 +93,14 @@ public class ChallengeService {
 
     @Transactional
     public void incrementCompletedCount(UUID challengeId) {
-        challengeRepository.findById(challengeId).ifPresent(challenge -> {
-            challenge.setCompletedCount(challenge.getCompletedCount() + 1);
-            challengeRepository.save(challenge);
-        });
+        // Use atomic increment in database to prevent race conditions
+        challengeRepository.incrementCompletedCount(challengeId);
     }
 
     @Transactional
     public void incrementAttemptedCount(UUID challengeId) {
-        challengeRepository.findById(challengeId).ifPresent(challenge -> {
-            challenge.setAttemptedCount(challenge.getAttemptedCount() + 1);
-            challengeRepository.save(challenge);
-        });
+        // Use atomic increment in database to prevent race conditions
+        challengeRepository.incrementAttemptedCount(challengeId);
     }
 
     private void updateChallengeFromRequest(Challenge challenge, ChallengeRequest request) {
