@@ -3,10 +3,12 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
-import { CheckCircle2, Code2, Terminal, Zap } from "lucide-react";
+import { TerminalWindow } from "@/components/ui/TerminalWindow";
+import { TerminalTyping } from "@/components/ui/TerminalTyping";
+import { CheckCircle2, Terminal, Zap } from "lucide-react";
 
 /**
- * Hero Section - Seção principal da landing page
+ * Hero Section - Seção principal da landing page com estilo terminal
  */
 export function HeroSection() {
   const prefersReducedMotion = useReducedMotion();
@@ -91,25 +93,41 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
+    <section className="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32 bg-terminal-bg">
+      {/* Grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(30,202,211,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(30,202,211,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
       <Container>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Conteúdo */}
           <div className="max-w-2xl">
+            <motion.div
+              variants={titleVariants}
+              initial="hidden"
+              animate="visible"
+              className="mb-6 font-mono text-sm"
+            >
+              <span className="text-terminal-green">user@compila</span>
+              <span className="text-terminal-gray">:</span>
+              <span className="text-terminal-blue">~</span>
+              <span className="text-terminal-gray">$</span>
+              <span className="text-terminal-cyan"> ./intro.sh</span>
+            </motion.div>
+
             <motion.h1
               variants={titleVariants}
               initial="hidden"
               animate="visible"
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-primary dark:text-dark-foreground leading-tight mb-6"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-terminal-fg leading-tight mb-6"
             >
               Compile conhecimento,{" "}
-              <span className="text-accent">execute sua carreira</span>
+              <span className="text-terminal-cyan glow-cyan">execute sua carreira</span>
             </motion.h1>
             <motion.p
               variants={subtitleVariants}
               initial="hidden"
               animate="visible"
-              className="text-lg sm:text-xl text-neutral-dark dark:text-dark-muted mb-8 leading-relaxed"
+              className="text-lg sm:text-xl text-terminal-gray-light mb-8 leading-relaxed"
             >
               Pratique programação com desafios reais em Frontend, Backend,
               Mobile, IoT e DevOps. 100% em português.
@@ -122,15 +140,15 @@ export function HeroSection() {
               animate="visible"
               className="flex flex-col sm:flex-row gap-4 mb-8"
             >
-              <Button size="lg" className="w-full sm:w-auto shadow-lg shadow-accent/20">
-                Começar Grátis
+              <Button size="lg" className="w-full sm:w-auto bg-terminal-cyan hover:bg-terminal-cyan/90 text-terminal-bg font-semibold shadow-lg shadow-terminal-cyan/20">
+                npm start
               </Button>
               <Button
                 size="lg"
                 variant="secondary"
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto border-terminal-blue text-terminal-blue hover:bg-terminal-blue/10"
               >
-                Explorar Desafios
+                ./explore.sh
               </Button>
             </motion.div>
 
@@ -147,68 +165,93 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Hero Visual - Demonstração visual */}
+          {/* Hero Visual - Terminal com código */}
           <motion.div
             variants={imageVariants}
             initial="hidden"
             animate="visible"
             className="relative"
           >
-            <div className="rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 p-1 shadow-2xl">
-              <div className="w-full rounded-lg bg-neutral-900 dark:bg-[#0A0F1D] p-6 font-mono text-sm overflow-hidden">
-                {/* Barra de janela */}
-                <div className="flex items-center gap-2 mb-4 text-neutral-400">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
-                  </div>
-                  <div className="flex-1 text-right text-xs">
-                    main.tsx
-                  </div>
-                </div>
-
-                {/* Código de exemplo com sintaxe realista */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                  className="space-y-1"
-                >
-                  <CodeLine>import Challenge from "compila-dev"</CodeLine>
-                  <CodeLine>import CodeEditor from "@/compila/ui"</CodeLine>
-                  <CodeLine/>
-                  <CodeLine>const challenge = await getChallenge("recursão");</CodeLine>
-                  <CodeLine>const solution = await solve(challenge);</CodeLine>
-                  <CodeLine/>
-                  <CodeLine>const feedback = await analyzeCode(solution);</CodeLine>
-                  <CodeLine/>
-                  <CodeLine>const success = feedback.passed;</CodeLine>
-                  <CodeLine>console.log("Parabéns! + 50 XP");</CodeLine>
-                </motion.div>
+            <TerminalWindow title="user@compila:~/challenges" className="shadow-2xl shadow-terminal-cyan/10">
+              <div className="space-y-2">
+                {/* Código com syntax highlight em tons de azul */}
+                <CodeLine>
+                  <span className="text-terminal-purple">import</span>
+                  <span className="text-terminal-fg"> Challenge </span>
+                  <span className="text-terminal-purple">from</span>
+                  <span className="text-terminal-blue"> "compila-dev"</span>
+                </CodeLine>
+                <CodeLine>
+                  <span className="text-terminal-purple">import</span>
+                  <span className="text-terminal-fg"> CodeEditor </span>
+                  <span className="text-terminal-purple">from</span>
+                  <span className="text-terminal-blue"> "@/compila/ui"</span>
+                </CodeLine>
+                <CodeLine />
+                <CodeLine>
+                  <span className="text-terminal-purple">const</span>
+                  <span className="text-terminal-fg"> challenge </span>
+                  <span className="text-terminal-gray">=</span>
+                  <span className="text-terminal-purple"> await</span>
+                  <span className="text-terminal-fg"> getChallenge(</span>
+                  <span className="text-terminal-blue">"recursão"</span>
+                  <span className="text-terminal-fg">)</span>
+                </CodeLine>
+                <CodeLine>
+                  <span className="text-terminal-purple">const</span>
+                  <span className="text-terminal-fg"> solution </span>
+                  <span className="text-terminal-gray">=</span>
+                  <span className="text-terminal-purple"> await</span>
+                  <span className="text-terminal-fg"> solve(challenge)</span>
+                </CodeLine>
+                <CodeLine />
+                <CodeLine>
+                  <span className="text-terminal-purple">const</span>
+                  <span className="text-terminal-fg"> feedback </span>
+                  <span className="text-terminal-gray">=</span>
+                  <span className="text-terminal-purple"> await</span>
+                  <span className="text-terminal-fg"> analyzeCode(solution)</span>
+                </CodeLine>
+                <CodeLine />
+                <CodeLine>
+                  <span className="text-terminal-purple">const</span>
+                  <span className="text-terminal-fg"> success </span>
+                  <span className="text-terminal-gray">=</span>
+                  <span className="text-terminal-fg"> feedback</span>
+                  <span className="text-terminal-gray">.</span>
+                  <span className="text-terminal-fg">passed</span>
+                </CodeLine>
+                <CodeLine>
+                  <span className="text-terminal-fg">console</span>
+                  <span className="text-terminal-gray">.</span>
+                  <span className="text-terminal-blue">log</span>
+                  <span className="text-terminal-fg">(</span>
+                  <span className="text-terminal-green">"Parabéns! + 50 XP"</span>
+                  <span className="text-terminal-fg">)</span>
+                </CodeLine>
 
                 {/* Status bar */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
-                  className="mt-6 flex items-center justify-between text-xs text-neutral-400"
+                  className="mt-6 flex items-center justify-between text-xs text-terminal-gray border-t border-gray-800 pt-4"
                 >
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <span>Compilado</span>
+                    <div className="w-2 h-2 rounded-full bg-terminal-green animate-pulse" />
+                    <span className="text-terminal-green">Compilado</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-3 w-3 text-green-500" />
-                    <span>3 testes passaram</span>
+                    <CheckCircle2 className="h-3 w-3 text-terminal-green" />
+                    <span className="text-terminal-fg">3 testes passaram</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-accent" />
-                    <span>+50 XP</span>
+                    <Zap className="h-3 w-3 text-terminal-cyan" />
+                    <span className="text-terminal-cyan">+50 XP</span>
                   </div>
                 </motion.div>
               </div>
-            </div>
+            </TerminalWindow>
 
             {/* Elementos decorativos animados */}
             <motion.div
@@ -220,7 +263,7 @@ export function HeroSection() {
                 repeat: prefersReducedMotion ? 0 : Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute -z-10 -top-4 -right-4 w-72 h-72 bg-accent/20 rounded-full blur-3xl"
+              className="absolute -z-10 -top-4 -right-4 w-72 h-72 bg-terminal-cyan/10 rounded-full blur-3xl"
             />
             <motion.div
               animate={{
@@ -243,25 +286,19 @@ export function HeroSection() {
 
 // Componente auxiliar para linha de código colorido
 function CodeLine({ children }: { children?: React.ReactNode }) {
-  const colors = {
-    keyword: "text-purple-400",
-    string: "text-orange-400",
-    number: "text-green-400",
-    comment: "text-gray-400",
-  };
-
   return (
-    <div className="flex">
+    <div className="flex font-mono text-sm leading-relaxed">
       {children || <span>&nbsp;</span>}
-    </div>);
+    </div>
+  );
 }
 
 // Componente para badge de confiança
 function TrustBadge({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card rounded-lg shadow-sm">
-      <CheckCircle2 className="h-4 w-4 text-green-500" />
-      <span className="text-sm font-medium text-neutral-700 dark:text-dark-foreground">{text}</span>
+    <div className="flex items-center gap-2 px-4 py-2 bg-terminal-bg border border-gray-800 rounded-lg">
+      <CheckCircle2 className="h-4 w-4 text-terminal-green" />
+      <span className="text-sm font-medium text-terminal-fg">{text}</span>
     </div>
   );
 }

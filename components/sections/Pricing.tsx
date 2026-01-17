@@ -1,13 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Check, CheckCircle2, Crown, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
+import { TerminalWindow } from "@/components/ui/TerminalWindow";
+import { Check, Crown, Package } from "lucide-react";
 import { pricingPlans } from "@/lib/data";
 
 /**
- * Pricing - Planos FREE vs PRO
+ * Pricing - Planos no estilo npm list
  */
 export function Pricing() {
   const prefersReducedMotion = useReducedMotion();
@@ -17,12 +18,8 @@ export function Pricing() {
     visible: { opacity: 1, y: 0 },
   };
 
-  const getPlanFeatures = (plan: keyof typeof pricingPlans) => {
-    return pricingPlans[plan].features;
-  };
-
   return (
-    <section className="py-16 lg:py-24 bg-neutral-light/30 dark:bg-dark-background">
+    <section className="py-16 lg:py-24 bg-terminal-bg">
       <Container>
         <motion.div
           initial={containerVariants}
@@ -33,10 +30,17 @@ export function Pricing() {
           }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-primary dark:text-dark-foreground mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg mb-4 font-mono text-sm">
+            <span className="text-terminal-green">user@compila</span>
+            <span className="text-terminal-gray">:</span>
+            <span className="text-terminal-blue">~</span>
+            <span className="text-terminal-gray">$</span>
+            <span className="text-terminal-cyan"> npm list --depth=0</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-terminal-fg mb-4">
             Escolha seu plano
           </h2>
-          <p className="text-lg text-neutral-dark dark:text-dark-muted max-w-2xl mx-auto">
+          <p className="text-lg text-terminal-gray-light max-w-2xl mx-auto">
             Comece gratuitamente e evolua conforme seu progresso.
           </p>
         </motion.div>
@@ -53,48 +57,59 @@ export function Pricing() {
               ease: [0.25, 0.4, 0.25, 1],
             }}
           >
-            <div className="relative rounded-2xl p-8 bg-white dark:bg-dark-card border border-neutral-light dark:border-dark-border hover:border-accent/30 transition-colors">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-semibold text-primary dark:text-dark-foreground mb-2">
-                  {pricingPlans.free.name}
-                </h3>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-4xl font-bold text-primary dark:text-dark-foreground">
-                    {pricingPlans.free.price}
-                  </span>
+            <TerminalWindow title="compila-free@0.0.1" className="border-gray-700">
+              <div className="space-y-4">
+                {/* Package tree */}
+                <div className="font-mono text-sm space-y-1">
+                  <div className="text-terminal-gray">└──</div>
+                  <NpmItem
+                    name="@compila/challenges"
+                    version="50x selected"
+                    color="text-terminal-cyan"
+                  />
+                  <NpmItem
+                    name="@compila/portfolio"
+                    version="public"
+                    color="text-terminal-blue"
+                  />
+                  <NpmItem
+                    name="@compila/communities"
+                    version="3 included"
+                    color="text-terminal-purple"
+                  />
+                  <NpmItem
+                    name="@compila/tools"
+                    version="basic"
+                    color="text-terminal-green"
+                  />
+                  <NpmItem
+                    name="@compila/gamification"
+                    version="xp + badges"
+                    color="text-terminal-cyan"
+                  />
                 </div>
-                <p className="text-sm text-neutral-dark dark:text-dark-muted mt-1">
-                  {pricingPlans.free.period}
-                </p>
+
+                {/* Price tag */}
+                <div className="pt-4 border-t border-gray-800">
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-4xl font-bold text-terminal-fg">
+                      {pricingPlans.free.price}
+                    </span>
+                  </div>
+                  <p className="text-sm text-terminal-gray text-center mt-1">
+                    {pricingPlans.free.period}
+                  </p>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full border-terminal-blue text-terminal-blue hover:bg-terminal-blue/10"
+                >
+                  npm install --save
+                </Button>
               </div>
-
-              <ul className="space-y-3 mb-8">
-                {getPlanFeatures("free").map((feature, index) => (
-                  <motion.li
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      delay: prefersReducedMotion ? 0 : 0.3 + index * 0.05,
-                      duration: 0.3,
-                    }}
-                    className="flex items-start gap-3"
-                  >
-                    <Check className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-neutral-dark dark:text-dark-muted">{feature}</span>
-                  </motion.li>
-                ))}
-              </ul>
-
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full"
-              >
-                {pricingPlans.free.cta}
-              </Button>
-            </div>
+            </TerminalWindow>
           </motion.div>
 
           {/* Plano PRO */}
@@ -108,61 +123,91 @@ export function Pricing() {
               ease: [0.25, 0.4, 0.25, 1],
             }}
           >
-            <div className="relative rounded-2xl p-8 bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent shadow-2xl">
+            <TerminalWindow
+              title="compila-pro@1.0.0"
+              className="border-terminal-cyan shadow-2xl shadow-terminal-cyan/10"
+            >
               {/* Badge */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <div className="flex items-center gap-2">
-                  <Crown className="h-5 w-5 text-yellow-500" />
-                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 to-orange-600 text-sm font-semibold px-4 py-1 rounded-full">
-                    {pricingPlans.pro.badge}
-                  </span>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                <div className="flex items-center gap-2 bg-terminal-cyan text-terminal-bg px-4 py-1 rounded-full text-sm font-semibold">
+                  <Crown className="h-4 w-4" />
+                  {pricingPlans.pro.badge}
                 </div>
               </div>
 
-              <div className="text-center mb-6 mt-8">
-                <h3 className="text-2xl font-semibold text-white mb-2">
-                  {pricingPlans.pro.name}
-                </h3>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-4xl font-bold text-white">
-                    {pricingPlans.pro.price}
-                  </span>
+              <div className="space-y-4 mt-4">
+                {/* Package tree */}
+                <div className="font-mono text-sm space-y-1">
+                  <div className="text-terminal-gray">├──</div>
+                  <NpmItem
+                    name="@compila/challenges"
+                    version="500+ all access"
+                    color="text-terminal-cyan"
+                    glow
+                  />
+                  <NpmItem
+                    name="@compila/feedback"
+                    version="detailed AI (pt-BR)"
+                    color="text-terminal-blue"
+                    glow
+                  />
+                  <NpmItem
+                    name="@compila/communities"
+                    version="unlimited"
+                    color="text-terminal-purple"
+                    glow
+                  />
+                  <NpmItem
+                    name="@compila/certificates"
+                    version="LinkedIn verified"
+                    color="text-terminal-green"
+                    glow
+                  />
+                  <NpmItem
+                    name="@compila/analytics"
+                    version="full portfolio stats"
+                    color="text-terminal-cyan"
+                    glow
+                  />
+                  <NpmItem
+                    name="@compila/tools-pro"
+                    version="exclusive"
+                    color="text-terminal-blue"
+                    glow
+                  />
+                  <NpmItem
+                    name="@compila/support"
+                    version="priority"
+                    color="text-terminal-purple"
+                    glow
+                  />
+                  <div className="text-terminal-gray">└── <span className="text-terminal-green">ad-free</span></div>
                 </div>
-                <p className="text-sm text-white/80 mt-1">
-                  {pricingPlans.pro.period}
+
+                {/* Price tag */}
+                <div className="pt-4 border-t border-gray-800">
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-4xl font-bold text-terminal-cyan">
+                      {pricingPlans.pro.price}
+                    </span>
+                  </div>
+                  <p className="text-sm text-terminal-gray-light text-center mt-1">
+                    {pricingPlans.pro.period}
+                  </p>
+                </div>
+
+                <Button
+                  size="lg"
+                  className="w-full bg-terminal-cyan hover:bg-terminal-cyan/90 text-terminal-bg font-semibold"
+                >
+                  npm install pro --global
+                </Button>
+
+                <p className="text-xs text-terminal-gray text-center">
+                  {pricingPlans.pro.note}
                 </p>
               </div>
-
-              <ul className="space-y-3 mb-8">
-                {getPlanFeatures("pro").map((feature, index) => (
-                  <motion.li
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      delay: prefersReducedMotion ? 0 : 0.3 + index * 0.05,
-                      duration: 0.3,
-                    }}
-                    className="flex items-start gap-3"
-                  >
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-white">{feature}</span>
-                  </motion.li>
-                ))}
-              </ul>
-
-              <Button
-                size="lg"
-                className="w-full bg-white text-primary hover:bg-neutral-100"
-              >
-                {pricingPlans.pro.cta}
-              </Button>
-
-              <p className="text-xs text-white/70 text-center mt-4">
-                {pricingPlans.pro.note}
-              </p>
-            </div>
+            </TerminalWindow>
           </motion.div>
         </div>
 
@@ -174,59 +219,85 @@ export function Pricing() {
           transition={{
             duration: prefersReducedMotion ? 0.3 : 0.5,
           }}
-          className="max-w-3xl mx-auto mt-8"
+          className="max-w-3xl mx-auto mt-12"
         >
-          <h4 className="text-center text-neutral-dark dark:text-dark-muted mb-6">
-            Comparativo de recursos
-          </h4>
-          <div className="space-y-4">
-            {[
-              {
-                feature: "Desafios disponíveis",
-                free: "50 selecionados",
-                pro: "500+ todos",
-              },
-              {
-                feature: "Feedback IA",
-                free: "Básico",
-                pro: "Detalhado em português",
-              },
-              {
-                feature: "Portfólio público",
-                free: "Básico",
-                pro: "Analytics completo + LinkedIn",
-              },
-              {
-                feature: "Comunidades",
-                free: "3 comunidades",
-                pro: "Ilimitadas",
-              },
-              {
-                feature: "Certificados",
-                free: "Não",
-                pro: "Verificados para LinkedIn",
-              },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between py-3 border-b border-neutral-light dark:border-dark-border"
-              >
-                <span className="text-sm font-medium text-neutral-dark dark:text-dark-muted">
-                  {item.feature}
-                </span>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-neutral-dark dark:text-dark-muted">
-                    {item.free}
-                  </span>
-                  <span className="text-sm font-semibold text-primary dark:text-accent">
-                    {item.pro}
-                  </span>
-                </div>
+          <TerminalWindow title="user@compila:~$ npm diff free pro" className="border-gray-800">
+            <div className="text-sm">
+              <div className="text-terminal-gray mb-4">
+                <span className="text-terminal-red">- removed</span>
+                <span className="mx-4">|</span>
+                <span className="text-terminal-green">+ added</span>
               </div>
-            ))}
-          </div>
+              <div className="space-y-2">
+                <DiffRow
+                  feature="challenges"
+                  removed="50 selected"
+                  added="500+ all"
+                />
+                <DiffRow
+                  feature="feedback"
+                  removed="basic"
+                  added="detailed pt-BR"
+                />
+                <DiffRow
+                  feature="portfolio"
+                  removed="basic"
+                  added="analytics + LinkedIn"
+                />
+                <DiffRow
+                  feature="communities"
+                  removed="3"
+                  added="unlimited"
+                />
+                <DiffRow
+                  feature="certificates"
+                  removed="—"
+                  added="verified"
+                />
+              </div>
+            </div>
+          </TerminalWindow>
         </motion.div>
       </Container>
     </section>
+  );
+}
+
+function NpmItem({
+  name,
+  version,
+  color,
+  glow = false,
+}: {
+  name: string;
+  version: string;
+  color: string;
+  glow?: boolean;
+}) {
+  return (
+    <div className={`flex items-center gap-2 pl-4 ${glow ? "text-terminal-fg" : ""}`}>
+      <span className="text-terminal-gray">├──</span>
+      <span className={color}>{name}</span>
+      <span className="text-terminal-gray">@</span>
+      <span className="text-terminal-gray-light">{version}</span>
+    </div>
+  );
+}
+
+function DiffRow({ feature, removed, added }: { feature: string; removed: string; added: string }) {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-gray-800/50">
+      <span className="text-sm font-medium text-terminal-gray-light w-32">
+        {feature}
+      </span>
+      <div className="flex items-center gap-6">
+        <span className="text-sm text-terminal-red line-through">
+          {removed}
+        </span>
+        <span className="text-sm font-semibold text-terminal-green">
+          {added}
+        </span>
+      </div>
+    </div>
   );
 }

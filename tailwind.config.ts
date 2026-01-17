@@ -42,6 +42,18 @@ const config: Config = {
           DEFAULT: "#FFFFFF",
           secondary: "#F8FAFC",
         },
+        // Cores Terminal/Console (azul-based)
+        terminal: {
+          bg: "#030712",       // Fundo principal do terminal
+          fg: "#F1F5F9",       // Texto principal
+          cyan: "#1ECAD3",     // Comandos/keywords (accent)
+          blue: "#60A5FA",     // Strings/valores
+          purple: "#A78BFA",   // Números/funções
+          green: "#34D399",    // Sucesso
+          red: "#F87171",      // Erros
+          gray: "#6B7280",     // Comentários/muted
+          "gray-light": "#9CA3AF", // Texto terciário
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

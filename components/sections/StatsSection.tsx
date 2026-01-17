@@ -1,19 +1,22 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Users, Code2, Trophy, Target, Zap, Building2 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
+import { TerminalWindow } from "@/components/ui/TerminalWindow";
+import { Cpu, HardDrive, Activity, Code2, Trophy, Zap, Building2 } from "lucide-react";
 
 /**
- * StatsSection - Estatísticas animadas para prova social
+ * StatsSection - Estatísticas no estilo sysinfo terminal
  */
 export function StatsSection() {
+  const prefersReducedMotion = useReducedMotion();
+
   const stats = [
-    { value: "500+", label: "Desafios", icon: Target },
-    { value: "10k+", label: "Desenvolvedores", icon: Users },
-    { value: "50+", label: "Badges", icon: Trophy },
-    { value: "1M+", label: "Submissões", icon: Code2 },
-    { value: "98%", label: "Satisfação", icon: Zap },
+    { value: "500+", label: "challenges", icon: Code2, color: "text-terminal-cyan" },
+    { value: "10k+", label: "developers", icon: Cpu, color: "text-terminal-blue" },
+    { value: "50+", label: "badges", icon: Trophy, color: "text-terminal-purple" },
+    { value: "1M+", label: "submissions", icon: Activity, color: "text-terminal-green" },
+    { value: "98%", label: "satisfaction", icon: Zap, color: "text-terminal-cyan" },
   ];
 
   const containerVariants = {
@@ -42,7 +45,7 @@ export function StatsSection() {
   };
 
   return (
-    <section className="py-12 lg:16 bg-neutral-50 dark:bg-dark-bg">
+    <section className="py-12 lg:py-16 bg-dark-background">
       <Container>
         <motion.div
           initial="hidden"
@@ -50,58 +53,101 @@ export function StatsSection() {
           viewport={{ once: true }}
           variants={containerVariants}
         >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-neutral-900 dark:text-dark-foreground mb-4">
-              Números que falam por si
+          {/* Header */}
+          <motion.div
+            variants={itemVariants}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-terminal-bg border border-gray-800 rounded-lg mb-4">
+              <span className="text-terminal-green">$</span>
+              <span className="text-terminal-cyan">sysinfo</span>
+              <span className="text-terminal-gray">--stats</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-terminal-fg mb-2">
+              System Metrics
             </h2>
-            <p className="text-lg text-neutral-600 dark:text-dark-muted max-w-2xl mx-auto">
-              Uma plataforma consolidada com milhares de desafios completados
+            <p className="text-sm text-terminal-gray">
+              Platform performance indicators
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                variants={itemVariants}
-                className="flex flex-col items-center justify-center p-6 bg-white dark:bg-dark-card rounded-2xl shadow-lg"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-3">
-                  <stat.icon className="w-6 h-6 text-white" />
+          {/* Terminal Window com stats */}
+          <motion.div
+            variants={itemVariants}
+            className="max-w-4xl mx-auto"
+          >
+            <TerminalWindow title="user@compila:~$ sysinfo --stats" className="shadow-2xl">
+              <div className="space-y-4">
+                {/* Header do output */}
+                <div className="text-terminal-gray text-xs mb-4">
+                  <span className="text-terminal-cyan">▌</span> Compila.dev Platform Statistics
+                  <span className="ml-4 text-terminal-gray-light">{new Date().toISOString().split('T')[0]}</span>
                 </div>
-                <div className="text-3xl font-bold text-primary dark:text-dark-foreground">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-neutral-600 dark:text-dark-muted">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
 
-          {/* Logos de empresas - prova social */}
-          <div className="mt-12 text-center">
-            <p className="text-sm text-neutral-500 dark:text-dark-muted mb-4">
-              Usado por desenvolvedores de empresas como:
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                  {stats.map((stat, index) => (
+                    <motion.div
+                      key={stat.label}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
+                      className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-terminal-cyan/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                        <span className="text-xs text-terminal-gray">{stat.label}</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${stat.color}`}>
+                        {stat.value}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Status bar do terminal */}
+                <div className="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between text-xs text-terminal-gray">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-terminal-green animate-pulse" />
+                    <span>system: operational</span>
+                  </div>
+                  <span>v2.4.1</span>
+                </div>
+              </div>
+            </TerminalWindow>
+          </motion.div>
+
+          {/* Logos de empresas - estilo "dependencies" */}
+          <motion.div
+            variants={itemVariants}
+            className="mt-12"
+          >
+            <p className="text-sm text-terminal-gray mb-4 text-center">
+              <span className="text-terminal-cyan">$</span> cat ./companies.txt
             </p>
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={itemVariants}
-              className="flex flex-wrap justify-center gap-8 md:gap-12"
+              className="flex flex-wrap justify-center gap-4 md:gap-6"
             >
-              {["Nubank", "iFood", "VTEX", "Mercado Livre", "Itaú", "Banco do Brasil"].map((company) => (
-                <div
+              {["Nubank", "iFood", "VTEX", "Mercado Livre", "Itaú", "Banco do Brasil"].map((company, index) => (
+                <motion.div
                   key={company}
-                  className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-dark-card rounded-lg shadow-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-terminal-bg border border-gray-800 rounded-lg"
                 >
-                  <Building2 className="h-5 w-5 text-neutral-400" />
-                  <span className="text-sm font-medium text-neutral-700 dark:text-dark-foreground">{company}</span>
-                </div>
+                  <Building2 className="h-4 w-4 text-terminal-gray" />
+                  <span className="text-sm text-terminal-fg font-mono">{company}</span>
+                </motion.div>
               ))}
             </motion.div>
-          </div>
+          </motion.div>
         </motion.div>
       </Container>
     </section>
